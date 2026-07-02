@@ -60,7 +60,7 @@ Cách nhanh nhất để triển khai toàn bộ hệ thống (bao gồm Redis C
 
 ```bash
 # Clone repository
-git clone https://github.com/ayamiko/Yukinoaaa.git
+git clone https://github.com/ayamiko0/Yukinoaaa.git
 cd Yukinoaaa
 
 # Build và khởi chạy ngầm bằng Docker Compose
