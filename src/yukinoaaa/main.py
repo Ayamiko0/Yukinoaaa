@@ -132,6 +132,7 @@ class ApplicationOrchestrator:
         await self._event_bus.subscribe("OrderFilled", self._on_market_event)
 
         # Start core loops
+        await self._event_bus.start()
         await self._portfolio_service.start()
         await self._order_manager.start()
         await self._streamer.start(["BTC/USDT"])
@@ -161,6 +162,7 @@ class ApplicationOrchestrator:
         await self._streamer.stop()
         await self._order_manager.stop()
         await self._portfolio_service.stop()
+        await self._event_bus.stop()
         await self._cache.close()
         self._logger.info("Shutdown complete. All resources cleanly released.")
 
