@@ -121,7 +121,7 @@ class AsyncApiServer:
                 body_bytes = await reader.readexactly(content_length)
 
             # Routing
-            if method == "GET" and path == "/health":
+            if method == "GET" and path in ("/health", "/api/v1/health"):
                 await self._send_json(writer, 200, ApiResponse(data={"status": "ONLINE", "uptime": "ok"}).model_dump())
             elif method == "GET" and path == "/api/v1/portfolio":
                 await self._handle_get_portfolio(writer)

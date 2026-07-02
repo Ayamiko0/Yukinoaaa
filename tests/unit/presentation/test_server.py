@@ -35,13 +35,14 @@ async def test_async_api_server_endpoints_and_static_serving() -> None:
     await asyncio.sleep(0.05)
 
     try:
-        # Test GET /health
-        url_health = f"http://127.0.0.1:{port}/health"
-        status, content = await asyncio.to_thread(fetch_url, url_health)
-        data = json.loads(content)
-        assert status == 200
-        assert data["status"] == "success"
-        assert data["data"]["status"] == "ONLINE"
+        # Test GET /health and /api/v1/health
+        for health_path in ("/health", "/api/v1/health"):
+            url_health = f"http://127.0.0.1:{port}{health_path}"
+            status, content = await asyncio.to_thread(fetch_url, url_health)
+            data = json.loads(content)
+            assert status == 200
+            assert data["status"] == "success"
+            assert data["data"]["status"] == "ONLINE"
 
         # Test GET /api/v1/portfolio
         url_port = f"http://127.0.0.1:{port}/api/v1/portfolio"
