@@ -14,6 +14,7 @@ from yukinoaaa.application.market.validator import MarketValidator
 from yukinoaaa.application.risk.engine import RiskEngine
 from yukinoaaa.application.risk.sizing import PositionCalculator
 from yukinoaaa.application.risk.validator import RiskValidator
+from yukinoaaa.application.trading.notification_service import TradingNotificationService
 from yukinoaaa.application.trading.portfolio_service import PortfolioService
 from yukinoaaa.application.trading.strategies.rsi_reversal import RsiReversalStrategy
 from yukinoaaa.application.trading.strategy_engine import StrategyEngine
@@ -22,11 +23,14 @@ from yukinoaaa.domain.market.events import KlineReceivedEvent, TickReceivedEvent
 from yukinoaaa.domain.risk.models import RiskPolicy
 from yukinoaaa.infrastructure.cache.redis_cache import RedisCache
 from yukinoaaa.infrastructure.config.loader import Settings
+from yukinoaaa.infrastructure.discord.mock_adapter import MockDiscordAdapter
+from yukinoaaa.infrastructure.discord.webhook_adapter import DiscordWebhookAdapter
 from yukinoaaa.infrastructure.events.event_bus import AsyncEventBus
 from yukinoaaa.infrastructure.exchange.mock_adapter import MockExchangeAdapter
 from yukinoaaa.infrastructure.execution.fill_simulator import FillSimulator
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger
 from yukinoaaa.presentation.api.server import AsyncApiServer
+from yukinoaaa.presentation.discord.bot import DiscordBot
 
 
 class ApplicationOrchestrator:
@@ -106,6 +110,24 @@ class ApplicationOrchestrator:
             redis_url=redis_url,
         )
 
+        # Discord Integration Layer
+        settings = Settings()
+        if settings.discord_webhook_url:
+            self._discord_adapter = DiscordWebhookAdapter(webhook_url=settings.discord_webhook_url, logger=self._logger)
+        else:
+            self._discord_adapter = MockDiscordAdapter(logger=self._logger)
+        self._notification_service = TradingNotificationService(
+            notification_service=self._discord_adapter,
+            event_bus=self._event_bus,
+            logger=self._logger,
+        )
+        self._discord_bot = DiscordBot(
+            notification_service=self._discord_adapter,
+            logger=self._logger,
+            portfolio_service=self._portfolio_service,
+            orchestrator=self._backtest_orchestrator,
+        )
+
         # Presentation Layer
         self._api_server = AsyncApiServer(
             host=host,
@@ -113,6 +135,8 @@ class ApplicationOrchestrator:
             logger=self._logger,
             portfolio_service=self._portfolio_service,
             orchestrator=self._backtest_orchestrator,
+            discord_bot=self._discord_bot,
+            discord_public_key=settings.discord_public_key,
         )
 
         self._is_running = False
@@ -136,6 +160,8 @@ class ApplicationOrchestrator:
         await self._portfolio_service.start()
         await self._order_manager.start()
         await self._streamer.start(["BTC/USDT"])
+        await self._notification_service.start()
+        await self._discord_bot.start()
         await self._api_server.start()
 
         self._is_running = True
@@ -159,6 +185,8 @@ class ApplicationOrchestrator:
         self._is_running = False
 
         await self._api_server.stop()
+        await self._discord_bot.stop()
+        await self._notification_service.stop()
         await self._streamer.stop()
         await self._order_manager.stop()
         await self._portfolio_service.stop()
@@ -176,12 +204,10 @@ class ApplicationOrchestrator:
     async def _start_signal_handlers(self) -> None:
         """Register UNIX SIGINT and SIGTERM handlers for graceful shutdown."""
         loop = asyncio.get_running_loop()
+        import contextlib
         for sig in (signal.SIGINT, signal.SIGTERM):
-            try:
+            with contextlib.suppress(NotImplementedError):
                 loop.add_signal_handler(sig, lambda: asyncio.create_task(self.stop()))
-            except NotImplementedError:
-                # Windows or non-main thread fallback
-                pass
 
 
 async def main() -> None:

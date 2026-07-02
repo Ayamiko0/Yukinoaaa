@@ -70,3 +70,64 @@ async def test_async_api_server_endpoints_and_static_serving() -> None:
     finally:
         await server.stop()
         await asyncio.sleep(0.05)
+
+
+@pytest.mark.asyncio
+async def test_async_api_server_discord_interactions() -> None:
+    """Verify Discord HTTP Interactions Gateway handles ping and slash commands."""
+    from yukinoaaa.infrastructure.discord.mock_adapter import MockDiscordAdapter
+    from yukinoaaa.presentation.discord.bot import DiscordBot
+
+    logger = StructlogLogger()
+    mock_discord = MockDiscordAdapter(logger=logger)
+    bot = DiscordBot(notification_service=mock_discord, logger=logger)
+    port = get_free_port()
+    server = AsyncApiServer("127.0.0.1", port, logger, discord_bot=bot)
+
+    await bot.start()
+    await server.start()
+    await asyncio.sleep(0.05)
+
+    try:
+        url_interact = f"http://127.0.0.1:{port}/api/v1/discord/interactions"
+
+        # 1. Test PING (Type 1)
+        req_ping_body = json.dumps({"type": 1}).encode("utf-8")
+        req_ping = Request(url_interact, data=req_ping_body, headers={"Content-Type": "application/json"}, method="POST")
+        status, content = await asyncio.to_thread(fetch_url, req_ping)
+        data = json.loads(content)
+        assert status == 200
+        assert data["type"] == 1
+
+        # 2. Test APPLICATION_COMMAND /status (Type 2)
+        req_cmd_body = json.dumps({
+            "type": 2,
+            "data": {"name": "status"},
+            "member": {"user": {"id": "tester_101"}}
+        }).encode("utf-8")
+        req_cmd = Request(url_interact, data=req_cmd_body, headers={"Content-Type": "application/json"}, method="POST")
+        status, content = await asyncio.to_thread(fetch_url, req_cmd)
+        data = json.loads(content)
+        assert status == 200
+        assert data["type"] == 4
+        assert "System Health Status" in data["data"]["embeds"][0]["title"]
+
+        # 3. Test APPLICATION_COMMAND /price ETH/USDT with options
+        req_price_body = json.dumps({
+            "type": 2,
+            "data": {
+                "name": "price",
+                "options": [{"name": "symbol", "value": "ETH/USDT"}]
+            },
+            "user": {"id": "tester_102"}
+        }).encode("utf-8")
+        req_price = Request(url_interact, data=req_price_body, headers={"Content-Type": "application/json"}, method="POST")
+        status, content = await asyncio.to_thread(fetch_url, req_price)
+        data = json.loads(content)
+        assert status == 200
+        assert data["type"] == 4
+        assert "ETH/USDT" in data["data"]["embeds"][0]["title"]
+    finally:
+        await server.stop()
+        await bot.stop()
+        await asyncio.sleep(0.05)

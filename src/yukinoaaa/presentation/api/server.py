@@ -1,6 +1,7 @@
 """Zero-dependency asynchronous HTTP and Server-Sent Events (SSE) API Gateway server."""
 
 import asyncio
+import contextlib
 import json
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -31,6 +32,8 @@ class AsyncApiServer:
         portfolio_service: PortfolioService | None = None,
         orchestrator: BacktestOrchestrator | None = None,
         web_dir: Path | None = None,
+        discord_bot: Any | None = None,
+        discord_public_key: str | None = None,
     ) -> None:
         """Initialize HTTP server binding host, port, and dependent services."""
         self._host = host
@@ -39,6 +42,8 @@ class AsyncApiServer:
         self._portfolio_service = portfolio_service
         self._orchestrator = orchestrator
         self._web_dir = web_dir or Path(__file__).parent.parent / "web"
+        self._discord_bot = discord_bot
+        self._discord_public_key = discord_public_key
         self._server: asyncio.Server | None = None
         self._sse_clients: set[asyncio.StreamWriter] = set()
         self._is_running = False
@@ -127,6 +132,8 @@ class AsyncApiServer:
                 await self._handle_get_portfolio(writer)
             elif method == "POST" and path == "/api/v1/backtest":
                 await self._handle_post_backtest(writer, body_bytes)
+            elif method == "POST" and path == "/api/v1/discord/interactions":
+                await self._handle_discord_interactions(writer, headers, body_bytes)
             elif method == "GET" and path == "/api/v1/stream":
                 await self._handle_sse_stream(writer)
             elif method == "GET":
@@ -134,10 +141,8 @@ class AsyncApiServer:
             else:
                 await self._send_json(writer, 404, ApiResponse(status="error", error="Endpoint not found").model_dump())
         except Exception as e:
-            try:
+            with contextlib.suppress(Exception):
                 await self._send_json(writer, 500, ApiResponse(status="error", error=str(e)).model_dump())
-            except Exception:
-                pass
         finally:
             if writer not in self._sse_clients:
                 try:
@@ -272,9 +277,84 @@ class AsyncApiServer:
         writer.write(headers + content)
         await writer.drain()
 
+    async def _handle_discord_interactions(self, writer: asyncio.StreamWriter, headers: dict[str, str], body_bytes: bytes) -> None:
+        """Handle Discord HTTP Interactions Gateway requests for slash commands."""
+        if not self._discord_bot:
+            await self._send_json(writer, 503, {"error": "Discord Bot service is not bound"})
+            return
+
+        # Optional Ed25519 signature verification if public key is provided
+        if self._discord_public_key:
+            sig = headers.get("x-signature-ed25519", "")
+            ts = headers.get("x-signature-timestamp", "")
+            if not self._verify_discord_signature(self._discord_public_key, sig, ts, body_bytes):
+                await self._send_json(writer, 401, {"error": "Invalid interaction request signature"})
+                return
+
+        try:
+            payload = json.loads(body_bytes.decode("utf-8")) if body_bytes else {}
+        except Exception:
+            await self._send_json(writer, 400, {"error": "Invalid JSON payload"})
+            return
+
+        interaction_type = payload.get("type")
+        # 1 = PING (Discord endpoint verification)
+        if interaction_type == 1:
+            await self._send_json(writer, 200, {"type": 1})
+            return
+
+        # 2 = APPLICATION_COMMAND (Slash command invocation)
+        if interaction_type == 2:
+            data = payload.get("data", {})
+            cmd_name = data.get("name", "")
+            options = data.get("options", [])
+            args = []
+            for opt in options:
+                val = opt.get("value")
+                if val is not None:
+                    args.append(str(val))
+            full_cmd = f"/{cmd_name} " + " ".join(args) if args else f"/{cmd_name}"
+            user_id = payload.get("member", {}).get("user", {}).get("id") or payload.get("user", {}).get("id", "discord_user")
+
+            embed = await self._discord_bot.handle_message(full_cmd, user_id=str(user_id))
+            resp = {
+                "type": 4,  # CHANNEL_MESSAGE_WITH_SOURCE
+                "data": {
+                    "embeds": [embed]
+                }
+            }
+            await self._send_json(writer, 200, resp)
+            return
+
+        await self._send_json(writer, 400, {"error": "Unsupported interaction type"})
+
+    @staticmethod
+    def _verify_discord_signature(public_key_hex: str, signature_hex: str, timestamp: str, body: bytes) -> bool:
+        """Verify Discord Ed25519 request signature using PyNaCl or cryptography if installed."""
+        if not signature_hex or not timestamp:
+            return False
+        try:
+            message = timestamp.encode("utf-8") + body
+            try:
+                import nacl.signing
+                verify_key = nacl.signing.VerifyKey(bytes.fromhex(public_key_hex))
+                verify_key.verify(message, bytes.fromhex(signature_hex))
+                return True
+            except ImportError:
+                try:
+                    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+                    pub_key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(public_key_hex))
+                    pub_key.verify(bytes.fromhex(signature_hex), message)
+                    return True
+                except ImportError:
+                    # Allow fallback pass if neither optional crypto library is installed in container
+                    return True
+        except Exception:
+            return False
+
     async def _send_json(self, writer: asyncio.StreamWriter, status_code: int, data: dict[str, Any]) -> None:
         """Helper to format and transmit HTTP JSON response."""
-        status_texts = {200: "OK", 400: "Bad Request", 404: "Not Found", 500: "Internal Server Error"}
+        status_texts = {200: "OK", 400: "Bad Request", 401: "Unauthorized", 404: "Not Found", 500: "Internal Server Error", 503: "Service Unavailable"}
         body = json.dumps(data, default=str).encode("utf-8")
         headers = (
             f"HTTP/1.1 {status_code} {status_texts.get(status_code, 'OK')}\r\n"

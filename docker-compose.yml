@@ -8,13 +8,19 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      - APP_ENV=development
-      - LOG_LEVEL=INFO
-      - DATABASE_URL=postgresql+asyncpg://yukinoaaa:secret_password@postgres:5432/yukinoaaa_db
-      - REDIS_URL=redis://default:secret_redis@redis:6379/0
-      - YUKINOAAA_HOST=0.0.0.0
-      - YUKINOAAA_PORT=8000
+      - APP_ENV=${APP_ENV:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://yukinoaaa:secret_password@postgres:5432/yukinoaaa_db}
+      - REDIS_URL=${REDIS_URL:-redis://default:secret_redis@redis:6379/0}
+      - YUKINOAAA_HOST=${YUKINOAAA_HOST:-0.0.0.0}
+      - YUKINOAAA_PORT=${YUKINOAAA_PORT:-8000}
+      - DISCORD_ENABLED=${DISCORD_ENABLED:-true}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-}
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN:-}
+      - DISCORD_PUBLIC_KEY=${DISCORD_PUBLIC_KEY:-}
     depends_on:
       postgres:
         condition: service_healthy

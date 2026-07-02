@@ -30,6 +30,22 @@ class Settings(BaseSettings, IConfig):
         default=8000,
         description="API Server bind port",
     )
+    discord_enabled: bool = Field(
+        default=True,
+        description="Enable Discord Bot notification and command integration",
+    )
+    discord_webhook_url: str | None = Field(
+        default=None,
+        description="Discord Webhook URL for automated trading alerts and embeds",
+    )
+    discord_bot_token: str | None = Field(
+        default=None,
+        description="Discord Bot Token for API interactions",
+    )
+    discord_public_key: str | None = Field(
+        default=None,
+        description="Discord Application Public Key for interaction signature verification",
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env",
