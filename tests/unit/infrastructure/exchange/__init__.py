@@ -1,0 +1,1 @@
+"""Exchange adapter unit tests."""

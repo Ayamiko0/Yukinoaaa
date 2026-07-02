@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yukinoaaa Trading Assistant | Real-Time Quant Studio</title>
+    <meta name="description" content="AI-First, Domain-Driven, Event-Driven Production-Ready Trading Assistant & Quant Analytics Dashboard.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <!-- Background Animated Gradient Glow -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <!-- Main Navigation Header -->
+    <header class="navbar">
+        <div class="brand">
+            <span class="brand-icon">❄️</span>
+            <span class="brand-text">Yukino<span class="highlight">aaa</span></span>
+            <span class="brand-badge">PROD CORE v0.1</span>
+        </div>
+        <div class="nav-metrics">
+            <div class="metric-chip">
+                <span class="label">EQUITY</span>
+                <span class="value" id="nav-equity">$10,000.00</span>
+            </div>
+            <div class="metric-chip">
+                <span class="label">STATUS</span>
+                <span class="status-indicator online"></span>
+                <span class="value" id="nav-status">ONLINE</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Studio Grid -->
+    <main class="studio-grid">
+        <!-- Left Panel: Live Market Studio & Charting -->
+        <section class="glass-card market-studio">
+            <header class="card-header">
+                <h2>📈 Live Market Monitor</h2>
+                <span class="tag">SSE STREAMING</span>
+            </header>
+            <div class="ticker-box">
+                <div class="ticker-symbol" id="ticker-symbol">BTC / USDT</div>
+                <div class="ticker-price-container">
+                    <span class="ticker-price" id="ticker-price">95,420.50</span>
+                    <span class="ticker-change positive" id="ticker-change">+4.25%</span>
+                </div>
+            </div>
+            <!-- Visual Price Trend Display -->
+            <div class="trend-visualizer">
+                <div class="bar-chart-container">
+                    <div class="candle bull" style="height: 60%"></div>
+                    <div class="candle bull" style="height: 75%"></div>
+                    <div class="candle bear" style="height: 45%"></div>
+                    <div class="candle bull" style="height: 85%"></div>
+                    <div class="candle bull active" style="height: 90%" id="live-candle"></div>
+                </div>
+                <div class="chart-footer">Live High-Frequency Event Engine Processing 24/7</div>
+            </div>
+        </section>
+
+        <!-- Right Panel: Portfolio & Open Positions -->
+        <section class="glass-card portfolio-studio">
+            <header class="card-header">
+                <h2>🛡️ Active Portfolio & Positions</h2>
+                <button class="btn-refresh" id="btn-refresh">🔄 Sync</button>
+            </header>
+            <div class="portfolio-summary-grid">
+                <div class="summary-box">
+                    <span class="sum-label">Available Balance</span>
+                    <span class="sum-val" id="port-balance">$10,000.00</span>
+                </div>
+                <div class="summary-box">
+                    <span class="sum-label">Total Equity</span>
+                    <span class="sum-val highlight" id="port-equity">$10,000.00</span>
+                </div>
+                <div class="summary-box">
+                    <span class="sum-label">Open Positions</span>
+                    <span class="sum-val" id="port-pos-count">0</span>
+                </div>
+            </div>
+            <div class="positions-table-container">
+                <table class="positions-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Side</th>
+                            <th>Qty</th>
+                            <th>Entry</th>
+                            <th>Unrealized PnL</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="positions-tbody">
+                        <tr class="empty-row"><td colspan="6">No open trading positions. Risk bounds protected.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Bottom Panel: Backtesting & Quantitative Analytics Studio -->
+        <section class="glass-card backtest-studio grid-full">
+            <header class="card-header">
+                <h2>🧪 Quant Backtest & Performance Analytics Studio</h2>
+                <span class="tag purple">IN-MEMORY ENGINE</span>
+            </header>
+            <div class="backtest-layout">
+                <form id="backtest-form" class="backtest-form">
+                    <div class="form-group">
+                        <label for="bt-symbol">Trading Pair</label>
+                        <select id="bt-symbol" name="symbol" class="form-input">
+                            <option value="BTC/USDT">BTC/USDT (Bitcoin)</option>
+                            <option value="ETH/USDT">ETH/USDT (Ethereum)</option>
+                            <option value="SOL/USDT">SOL/USDT (Solana)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bt-strategy">Strategy Engine</label>
+                        <select id="bt-strategy" name="strategy_name" class="form-input">
+                            <option value="RSI_Reversal">RSI Reversal Strategy (Oversold/Overbought)</option>
+                            <option value="MACD_Crossover">MACD Momentum Crossover</option>
+                            <option value="Bollinger_Breakout">Bollinger Bands Breakout</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bt-equity">Initial Capital ($)</label>
+                        <input type="number" id="bt-equity" name="initial_equity" class="form-input" value="10000" min="100" step="100">
+                    </div>
+                    <button type="submit" class="btn-submit" id="btn-run-bt">🚀 Execute Simulation</button>
+                </form>
+
+                <!-- Analytics Results Area -->
+                <div class="analytics-results" id="analytics-results">
+                    <div class="placeholder-msg">Configure simulation parameters and execute to view real-time quant analytics.</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/app.js"></script>
+</body>
+</html>

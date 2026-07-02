@@ -1,0 +1,65 @@
+services:
+  yukinoaaa:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: yukinoaaa:latest
+    container_name: yukinoaaa_app
+    restart: unless-stopped
+    environment:
+      - APP_ENV=development
+      - LOG_LEVEL=INFO
+      - DATABASE_URL=postgresql+asyncpg://yukinoaaa:secret_password@postgres:5432/yukinoaaa_db
+      - REDIS_URL=redis://default:secret_redis@redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - yukinoaaa_net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: yukinoaaa_postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=yukinoaaa
+      - POSTGRES_PASSWORD=secret_password
+      - POSTGRES_DB=yukinoaaa_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yukinoaaa -d yukinoaaa_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - yukinoaaa_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: yukinoaaa_redis
+    restart: unless-stopped
+    command: redis-server --requirepass secret_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "secret_redis", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - yukinoaaa_net
+
+networks:
+  yukinoaaa_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
