@@ -6,11 +6,15 @@ services:
     image: yukinoaaa:latest
     container_name: yukinoaaa_app
     restart: unless-stopped
+    ports:
+      - "8000:8000"
     environment:
       - APP_ENV=development
       - LOG_LEVEL=INFO
       - DATABASE_URL=postgresql+asyncpg://yukinoaaa:secret_password@postgres:5432/yukinoaaa_db
       - REDIS_URL=redis://default:secret_redis@redis:6379/0
+      - YUKINOAAA_HOST=0.0.0.0
+      - YUKINOAAA_PORT=8000
     depends_on:
       postgres:
         condition: service_healthy
