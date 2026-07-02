@@ -26,6 +26,7 @@ from yukinoaaa.infrastructure.cache.redis_cache import RedisCache
 from yukinoaaa.infrastructure.events.event_bus import AsyncEventBus
 from yukinoaaa.infrastructure.exchange.mock_adapter import MockExchangeAdapter
 from yukinoaaa.infrastructure.execution.fill_simulator import FillSimulator
+from yukinoaaa.infrastructure.config.loader import Settings
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger
 from yukinoaaa.presentation.api.server import AsyncApiServer
 
@@ -185,7 +186,12 @@ class ApplicationOrchestrator:
 
 async def main() -> None:
     """Main CLI execution entrypoint."""
-    orchestrator = ApplicationOrchestrator()
+    settings = Settings()
+    orchestrator = ApplicationOrchestrator(
+        host=settings.yukinoaaa_host,
+        port=settings.yukinoaaa_port,
+        redis_url=settings.redis_url,
+    )
     try:
         await orchestrator.run_until_stopped()
     except asyncio.CancelledError:

@@ -20,6 +20,14 @@ class Settings(BaseSettings, IConfig):
         default="redis://localhost:6379/0",
         description="Redis connection URL",
     )
+    yukinoaaa_host: str = Field(
+        default="0.0.0.0",
+        description="API Server bind host",
+    )
+    yukinoaaa_port: int = Field(
+        default=8000,
+        description="API Server bind port",
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env",
