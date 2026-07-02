@@ -15,7 +15,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY pyproject.toml ./
 COPY src ./src
-COPY docs ./docs
+COPY README.md ./
 
 # Install the application and runtime dependencies
 RUN pip install --no-cache-dir --upgrade pip && \

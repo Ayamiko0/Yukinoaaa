@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "yukinoaaa"
 version = "0.1.0"
 description = "AI-First | Domain-Driven | Event-Driven | Production-Ready Trading Assistant for Discord"
-readme = "docs/README.md"
+readme = "README.md"
 requires-python = ">=3.13"
 license = { text = "MIT" }
 authors = [
