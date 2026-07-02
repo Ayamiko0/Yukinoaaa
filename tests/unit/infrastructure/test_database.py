@@ -3,6 +3,7 @@
 import pytest
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
+
 from yukinoaaa.infrastructure.database.repository import BaseRepository
 from yukinoaaa.infrastructure.database.session import AsyncDatabase, Base
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger

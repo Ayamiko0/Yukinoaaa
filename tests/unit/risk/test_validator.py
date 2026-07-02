@@ -1,6 +1,7 @@
 """Tests for Risk Validator multi-layer evaluation."""
 
 from decimal import Decimal
+
 from yukinoaaa.application.risk.sizing import PositionCalculator
 from yukinoaaa.application.risk.validator import RiskValidator
 from yukinoaaa.domain.risk.models import RiskPolicy, RiskReport, RiskStatus

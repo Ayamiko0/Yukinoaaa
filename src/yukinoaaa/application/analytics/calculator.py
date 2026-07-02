@@ -1,7 +1,8 @@
 """Performance Analytics Calculator using pure Decimal math (zero external dependencies)."""
 
-from decimal import Decimal
 import math
+from decimal import Decimal
+
 from yukinoaaa.domain.backtest.models import PerformanceMetrics, TradeRecord
 
 

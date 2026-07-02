@@ -1,6 +1,7 @@
 """Moving Average Convergence Divergence (MACD) indicator implementation."""
 
 from decimal import Decimal
+
 from yukinoaaa.application.indicators.ema import EMA
 from yukinoaaa.application.interfaces.indicator import IIndicator
 from yukinoaaa.domain.indicators.models import IndicatorValue

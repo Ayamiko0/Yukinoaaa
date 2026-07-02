@@ -1,7 +1,9 @@
 """Tests for Position Sizing Calculator."""
 
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.application.risk.sizing import PositionCalculator
 from yukinoaaa.domain.exceptions import ValidationException
 from yukinoaaa.domain.risk.models import RiskPolicy

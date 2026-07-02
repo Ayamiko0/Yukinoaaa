@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 from typing import Any
+
 from yukinoaaa.application.interfaces.strategy import IStrategy
 from yukinoaaa.domain.market.models import MarketSnapshot
 from yukinoaaa.domain.trading.models import OrderSide, TradeSignal

@@ -1,6 +1,7 @@
 """Position Sizing Calculator using Fixed Fractional Risk formula."""
 
 from decimal import Decimal
+
 from yukinoaaa.domain.exceptions import ValidationException
 from yukinoaaa.domain.risk.models import RiskPolicy
 from yukinoaaa.domain.trading.models import OrderSide

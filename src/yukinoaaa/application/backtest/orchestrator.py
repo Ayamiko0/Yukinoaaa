@@ -1,8 +1,9 @@
 """Backtest Orchestrator tying all 5 phases into an isolated in-memory simulation environment."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
+
 from yukinoaaa.application.analytics.calculator import PerformanceCalculator
 from yukinoaaa.application.execution.manager import OrderManager
 from yukinoaaa.application.execution.router import OrderRouter
@@ -161,9 +162,9 @@ class BacktestOrchestrator:
             trade = TradeRecord(
                 symbol=str(payload.get("symbol", "UNKNOWN")),
                 side="LONG",
-                entry_time=event.timestamp or datetime.now(timezone.utc),
+                entry_time=event.timestamp or datetime.now(UTC),
                 entry_price=Decimal("100.0"),
-                exit_time=event.timestamp or datetime.now(timezone.utc),
+                exit_time=event.timestamp or datetime.now(UTC),
                 exit_price=Decimal("100.0"),
                 quantity=Decimal("1.0"),
                 realized_pnl=Decimal(str(payload.get("realized_pnl", "0.0"))),

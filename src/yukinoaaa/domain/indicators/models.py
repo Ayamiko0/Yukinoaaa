@@ -1,8 +1,9 @@
 """Immutable domain models for technical indicator values."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -13,7 +14,7 @@ class IndicatorValue(BaseModel):
     symbol: str = Field(..., description="Standardized symbol string, e.g., 'BTC/USDT'")
     timeframe: str = Field(..., description="Timeframe interval string, e.g., '1m', '1h', '1d'")
     timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         description="UTC timestamp of the calculation (usually closing time of candlestick)",
     )
     values: dict[str, Decimal | float | int] = Field(

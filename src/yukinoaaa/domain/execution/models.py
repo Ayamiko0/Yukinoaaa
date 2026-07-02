@@ -1,10 +1,11 @@
 """Execution domain models: ExecutionState and ExecutionReport."""
 
-from datetime import datetime, timezone
+import uuid
+from datetime import UTC, datetime
 from decimal import Decimal
 from enum import Enum
 from typing import Any
-import uuid
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -30,7 +31,7 @@ class ExecutionReport(BaseModel):
     average_price: Decimal | None = Field(default=None, description="Volume-weighted average fill price")
     fee: Decimal = Field(default=Decimal("0.0"), ge=0, description="Trading commission fee deducted")
     reason: str | None = Field(default=None, description="Explanation for REJECTED or FAILED status")
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     model_config = ConfigDict(frozen=True)

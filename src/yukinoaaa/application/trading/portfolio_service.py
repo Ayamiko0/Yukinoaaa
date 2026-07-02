@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 from typing import Any
+
 from yukinoaaa.application.interfaces.cache import ICache
 from yukinoaaa.application.interfaces.event_bus import IEventBus
 from yukinoaaa.application.interfaces.logger import ILogger

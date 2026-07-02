@@ -1,6 +1,7 @@
 """Order Router dispatching orders to target execution adapters."""
 
 from typing import Any
+
 from yukinoaaa.application.interfaces.event_bus import IEventBus
 from yukinoaaa.application.interfaces.execution import IExecutionAdapter
 from yukinoaaa.application.interfaces.logger import ILogger

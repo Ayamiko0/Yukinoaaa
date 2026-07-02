@@ -1,7 +1,8 @@
 """Health check service implementation."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
+
 from yukinoaaa.application.interfaces.cache import ICache
 from yukinoaaa.application.interfaces.database import IDatabase
 from yukinoaaa.application.interfaces.logger import ILogger
@@ -63,7 +64,7 @@ class HealthCheckService(IHealthCheck):
 
         report = {
             "status": overall_status,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "components": components,
         }
         if self._logger:

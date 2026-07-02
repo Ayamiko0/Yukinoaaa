@@ -2,7 +2,9 @@
 
 import asyncio
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.domain.market.models import Tick
 from yukinoaaa.infrastructure.exchange.mock_adapter import MockExchangeAdapter
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger

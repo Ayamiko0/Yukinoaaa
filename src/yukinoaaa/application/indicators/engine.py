@@ -3,6 +3,7 @@
 from collections import defaultdict
 from decimal import Decimal
 from typing import Any
+
 from yukinoaaa.application.interfaces.event_bus import IEventBus
 from yukinoaaa.application.interfaces.indicator import IIndicator
 from yukinoaaa.application.interfaces.logger import ILogger

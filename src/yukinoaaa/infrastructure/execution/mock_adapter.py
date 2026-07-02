@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 from typing import TYPE_CHECKING
+
 from yukinoaaa.application.interfaces.execution import IExecutionAdapter
 from yukinoaaa.application.trading.portfolio_service import PortfolioService
 from yukinoaaa.domain.execution.models import ExecutionReport, ExecutionState

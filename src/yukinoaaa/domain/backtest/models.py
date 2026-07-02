@@ -1,9 +1,10 @@
 """Backtest domain models: Config, TradeRecord, and PerformanceMetrics."""
 
-from datetime import datetime, timezone
+import uuid
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
-import uuid
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -58,6 +59,6 @@ class PerformanceMetrics(BaseModel):
     average_trade_pnl: Decimal = Field(default=Decimal("0.0"))
     largest_win: Decimal = Field(default=Decimal("0.0"))
     largest_loss: Decimal = Field(default=Decimal("0.0"))
-    generated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    generated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     model_config = ConfigDict(frozen=True)

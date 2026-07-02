@@ -1,7 +1,9 @@
 """Tests for presentation API data models."""
 
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.presentation.api.models import ApiResponse, BacktestRequest, PortfolioResponse
 
 

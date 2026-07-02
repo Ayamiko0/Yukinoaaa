@@ -1,7 +1,8 @@
 """Tests for market data normalizer and deduplication."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
+
 from yukinoaaa.application.market.normalizer import MarketNormalizer
 from yukinoaaa.domain.market.models import Tick
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger
@@ -12,7 +13,7 @@ def test_normalizer_deduplication() -> None:
     logger = StructlogLogger()
     normalizer = MarketNormalizer(logger=logger)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     tick1 = Tick(symbol="btc/usdt", price=Decimal("100"), volume=Decimal("1"), timestamp=now, exchange="binance")
     tick2 = Tick(symbol="BTC/USDT", price=Decimal("100"), volume=Decimal("1"), timestamp=now, exchange="binance")
 
@@ -29,7 +30,7 @@ def test_normalizer_reset_state() -> None:
     logger = StructlogLogger()
     normalizer = MarketNormalizer(logger=logger)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     tick = Tick(symbol="BTC/USDT", price=Decimal("100"), volume=Decimal("1"), timestamp=now, exchange="binance")
     normalizer.normalize_and_deduplicate(tick)
 

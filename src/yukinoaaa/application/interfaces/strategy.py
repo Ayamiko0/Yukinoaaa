@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 from typing import Any
+
 from yukinoaaa.domain.market.models import MarketSnapshot
 from yukinoaaa.domain.trading.models import TradeSignal
 

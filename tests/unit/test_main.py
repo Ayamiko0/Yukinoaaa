@@ -1,10 +1,11 @@
 """Tests for master ApplicationOrchestrator and lifecycle management."""
 
 import asyncio
-from datetime import datetime, timezone
-from decimal import Decimal
 import socket
+from datetime import UTC, datetime
+
 import pytest
+
 from yukinoaaa.domain.market.events import KlineReceivedEvent, TickReceivedEvent
 from yukinoaaa.main import ApplicationOrchestrator
 
@@ -32,7 +33,7 @@ async def test_application_orchestrator_lifecycle_and_event_forwarding() -> None
         assert orchestrator._api_server._is_running
 
         # Test forwarding TickReceivedEvent and KlineReceivedEvent
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         tick = TickReceivedEvent(
             event_type="TickReceived",
             payload={"symbol": "BTC/USDT", "price": "95000.00", "volume": "1.5"},

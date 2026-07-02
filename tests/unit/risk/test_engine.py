@@ -1,15 +1,17 @@
 """Tests for Risk Engine orchestrator."""
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.application.risk.engine import RiskEngine
 from yukinoaaa.application.risk.sizing import PositionCalculator
 from yukinoaaa.application.risk.validator import RiskValidator
 from yukinoaaa.application.trading.portfolio_service import PortfolioService
 from yukinoaaa.domain.events import DomainEvent
-from yukinoaaa.domain.risk.models import RiskPolicy, RiskStatus
+from yukinoaaa.domain.risk.models import RiskPolicy
 from yukinoaaa.domain.trading.events import PositionClosedEvent, SignalCreatedEvent
 from yukinoaaa.infrastructure.cache.redis_cache import RedisCache
 from yukinoaaa.infrastructure.events.event_bus import AsyncEventBus
@@ -58,7 +60,7 @@ async def test_risk_engine_orchestration_and_emergency_halt() -> None:
                 "target_price": "110.0",
                 "stop_loss": "95.0",
             },
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
     )
     await asyncio.sleep(0.05)
@@ -77,7 +79,7 @@ async def test_risk_engine_orchestration_and_emergency_halt() -> None:
                 "symbol": "BTC/USDT",
                 "realized_pnl": "-6000.0",  # 6,000 / 100,000 = 6% loss > 5% limit
             },
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
     )
     await asyncio.sleep(0.05)

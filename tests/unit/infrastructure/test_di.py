@@ -1,6 +1,7 @@
 """Tests for Dependency Injection container."""
 
 import pytest
+
 from yukinoaaa.infrastructure.di.container import Container
 
 

@@ -1,7 +1,7 @@
 """Market Data Streamer orchestrator with automatic exponential backoff reconnection."""
 
 import asyncio
-from typing import Any
+
 from yukinoaaa.application.interfaces.event_bus import IEventBus
 from yukinoaaa.application.interfaces.exchange import IExchangeAdapter
 from yukinoaaa.application.interfaces.logger import ILogger

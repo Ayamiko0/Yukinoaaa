@@ -1,8 +1,9 @@
 """Immutable market data domain models and value objects."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Literal
+from typing import Any, Literal
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
@@ -47,7 +48,7 @@ class Tick(BaseModel):
     bid: Decimal | None = Field(default=None, description="Current highest bid price")
     ask: Decimal | None = Field(default=None, description="Current lowest ask price")
     timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         description="UTC timestamp of the market tick",
     )
     exchange: str = Field(default="mock", description="Source exchange identifier")
@@ -121,7 +122,7 @@ class OrderBook(BaseModel):
 
     symbol: str = Field(..., description="Standardized symbol string, e.g., 'BTC/USDT'")
     timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         description="UTC timestamp of the order book snapshot",
     )
     bids: list[OrderBookEntry] = Field(default_factory=list, description="Bids sorted best (highest) to worst")
@@ -158,7 +159,7 @@ class MarketSnapshot(BaseModel):
     last_kline: Kline | None = Field(default=None, description="Most recent candlestick bar")
     orderbook: OrderBook | None = Field(default=None, description="Most recent order book depth")
     timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         description="UTC timestamp when snapshot was compiled",
     )
 

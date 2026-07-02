@@ -1,14 +1,15 @@
 """Tests for Performance Analytics Calculator pure Decimal math."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
+
 from yukinoaaa.application.analytics.calculator import PerformanceCalculator
 from yukinoaaa.domain.backtest.models import TradeRecord
 
 
 def test_performance_calculator_metrics_accuracy() -> None:
     """Verify win rate, profit factor, max drawdown, Sharpe, and Sortino ratios match exact math formulas."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     trades = [
         TradeRecord(
             symbol="BTC/USDT",

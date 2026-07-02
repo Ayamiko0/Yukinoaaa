@@ -3,6 +3,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Coroutine
 from typing import Any
+
 from yukinoaaa.domain.events import DomainEvent
 
 # Type alias for async event handler callbacks

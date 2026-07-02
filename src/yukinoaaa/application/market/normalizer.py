@@ -1,6 +1,5 @@
 """Market Data Normalizer and Deduplication engine."""
 
-from decimal import Decimal
 from yukinoaaa.application.interfaces.logger import ILogger
 from yukinoaaa.domain.market.models import Tick
 

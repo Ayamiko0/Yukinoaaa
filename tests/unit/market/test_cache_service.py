@@ -1,9 +1,11 @@
 """Tests for market cache service and event emitting."""
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.application.market.cache_service import MarketCacheService
 from yukinoaaa.domain.events import DomainEvent
 from yukinoaaa.domain.market.models import Kline, Tick
@@ -30,7 +32,7 @@ async def test_cache_service_process_tick_and_kline() -> None:
     await bus.subscribe("TickReceived", event_handler)
     await bus.subscribe("KlineReceived", event_handler)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     tick = Tick(symbol="BTC/USDT", price=Decimal("95000"), volume=Decimal("2.0"), timestamp=now)
     snapshot = await service.process_tick(tick)
     assert snapshot.last_tick == tick

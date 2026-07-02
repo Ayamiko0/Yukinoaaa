@@ -1,8 +1,10 @@
 """Tests for Strategy Engine orchestrator."""
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 import pytest
+
 from yukinoaaa.application.trading.strategies.rsi_reversal import RsiReversalStrategy
 from yukinoaaa.application.trading.strategy_engine import StrategyEngine
 from yukinoaaa.domain.events import DomainEvent
@@ -41,7 +43,7 @@ async def test_strategy_engine_evaluates_plugins_and_emits_signals() -> None:
                 "values": {"rsi": "25.5"},
                 "is_ready": True,
             },
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
     )
     await asyncio.sleep(0.05)

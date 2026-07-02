@@ -1,6 +1,7 @@
 """Global pytest fixtures."""
 
 import pytest
+
 from yukinoaaa.infrastructure.config.loader import Settings
 from yukinoaaa.infrastructure.events.event_bus import AsyncEventBus
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger

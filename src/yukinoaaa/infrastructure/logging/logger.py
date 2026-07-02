@@ -3,7 +3,9 @@
 import logging
 import sys
 from typing import Any
+
 import structlog
+
 from yukinoaaa.application.interfaces.logger import ILogger
 
 

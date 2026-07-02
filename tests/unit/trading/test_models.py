@@ -1,9 +1,18 @@
 """Tests for trading domain models: Position, Portfolio, and Order."""
 
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.domain.exceptions import ValidationException
-from yukinoaaa.domain.trading.models import Order, OrderSide, OrderType, Portfolio, Position, PositionSide
+from yukinoaaa.domain.trading.models import (
+    Order,
+    OrderSide,
+    OrderType,
+    Portfolio,
+    Position,
+    PositionSide,
+)
 
 
 def test_position_unrealized_pnl_calculation() -> None:

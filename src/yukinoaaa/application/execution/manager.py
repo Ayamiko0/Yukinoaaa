@@ -2,11 +2,15 @@
 
 from decimal import Decimal
 from typing import Any
+
 from yukinoaaa.application.interfaces.event_bus import IEventBus
 from yukinoaaa.application.interfaces.logger import ILogger
 from yukinoaaa.application.trading.portfolio_service import PortfolioService
 from yukinoaaa.domain.events import DomainEvent
-from yukinoaaa.domain.execution.events import OrderExecutionCompletedEvent, OrderPartiallyFilledEvent
+from yukinoaaa.domain.execution.events import (
+    OrderExecutionCompletedEvent,
+    OrderPartiallyFilledEvent,
+)
 from yukinoaaa.domain.execution.models import ExecutionState
 from yukinoaaa.domain.trading.events import OrderFilledEvent
 from yukinoaaa.domain.trading.models import Order, OrderSide, OrderStatus, Position, PositionSide

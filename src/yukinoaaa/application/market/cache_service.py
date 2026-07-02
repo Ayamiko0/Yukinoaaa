@@ -1,10 +1,15 @@
 """Market Cache Service for persisting real-time state and publishing events."""
 
 from typing import Any
+
 from yukinoaaa.application.interfaces.cache import ICache
 from yukinoaaa.application.interfaces.event_bus import IEventBus
 from yukinoaaa.application.interfaces.logger import ILogger
-from yukinoaaa.domain.market.events import KlineReceivedEvent, MarketSnapshotUpdatedEvent, TickReceivedEvent
+from yukinoaaa.domain.market.events import (
+    KlineReceivedEvent,
+    MarketSnapshotUpdatedEvent,
+    TickReceivedEvent,
+)
 from yukinoaaa.domain.market.models import Kline, MarketSnapshot, OrderBook, Tick
 
 

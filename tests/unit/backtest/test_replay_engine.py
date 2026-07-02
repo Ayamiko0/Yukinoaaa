@@ -1,9 +1,11 @@
 """Tests for Historical Replay Engine."""
 
 import asyncio
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.domain.events import DomainEvent
 from yukinoaaa.domain.market.models import Kline
 from yukinoaaa.infrastructure.backtest.replay_engine import HistoricalReplayEngine
@@ -32,7 +34,7 @@ async def test_replay_engine_pumps_klines_in_timestamp_order() -> None:
     await bus.subscribe("KlineReceived", on_k)
     await bus.subscribe("TickReceived", on_t)
 
-    t1 = datetime.now(timezone.utc)
+    t1 = datetime.now(UTC)
     t2 = t1 + timedelta(minutes=1)
 
     k1 = Kline(symbol="BTC/USDT", timeframe="1m", open_time=t1, close_time=t1 + timedelta(seconds=59), open=Decimal("100"), high=Decimal("105"), low=Decimal("99"), close=Decimal("104"), volume=Decimal("10"))

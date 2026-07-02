@@ -1,9 +1,11 @@
 """Tests for Backtest Orchestrator end-to-end execution and report formatting."""
 
 import asyncio
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.application.backtest.orchestrator import BacktestOrchestrator
 from yukinoaaa.domain.backtest.models import BacktestConfig
 from yukinoaaa.domain.market.models import Kline
@@ -16,7 +18,7 @@ async def test_backtest_orchestrator_execution_and_markdown_report() -> None:
     logger = StructlogLogger()
     orchestrator = BacktestOrchestrator(logger, redis_url="redis://localhost:59999/0")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     config = BacktestConfig(
         symbol="SOL/USDT",
         timeframe="1m",

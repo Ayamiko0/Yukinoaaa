@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 from typing import Any
+
 from yukinoaaa.application.interfaces.event_bus import IEventBus
 from yukinoaaa.application.interfaces.logger import ILogger
 from yukinoaaa.domain.events import DomainEvent
@@ -83,14 +84,10 @@ class FillSimulator:
 
                 is_triggered = False
                 if order.order_type == OrderType.LIMIT:
-                    if order.side == OrderSide.BUY and tick_price <= target_price:
-                        is_triggered = True
-                    elif order.side == OrderSide.SELL and tick_price >= target_price:
+                    if order.side == OrderSide.BUY and tick_price <= target_price or order.side == OrderSide.SELL and tick_price >= target_price:
                         is_triggered = True
                 elif order.order_type in (OrderType.STOP_LOSS, OrderType.TAKE_PROFIT):
-                    if order.side == OrderSide.BUY and tick_price >= target_price:
-                        is_triggered = True
-                    elif order.side == OrderSide.SELL and tick_price <= target_price:
+                    if order.side == OrderSide.BUY and tick_price >= target_price or order.side == OrderSide.SELL and tick_price <= target_price:
                         is_triggered = True
 
                 if is_triggered:

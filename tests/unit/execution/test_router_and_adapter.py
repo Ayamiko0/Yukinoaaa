@@ -1,9 +1,11 @@
 """Tests for Order Router and Mock Execution Adapter."""
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.application.execution.router import OrderRouter
 from yukinoaaa.application.trading.portfolio_service import PortfolioService
 from yukinoaaa.domain.events import DomainEvent
@@ -51,7 +53,7 @@ async def test_order_router_dispatches_to_mock_adapter() -> None:
         OrderCreatedEvent(
             event_type="OrderCreated",
             payload={"order_id": order.id, "symbol": order.symbol, "adapter": "MOCK"},
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
     )
     await asyncio.sleep(0.05)

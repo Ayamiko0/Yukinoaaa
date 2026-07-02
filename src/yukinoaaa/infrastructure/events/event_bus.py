@@ -2,7 +2,7 @@
 
 import asyncio
 from collections import defaultdict
-from typing import Any
+
 from yukinoaaa.application.interfaces.event_bus import EventHandler, IEventBus
 from yukinoaaa.application.interfaces.logger import ILogger
 from yukinoaaa.domain.events import DomainEvent

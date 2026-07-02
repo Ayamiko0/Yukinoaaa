@@ -1,6 +1,7 @@
 """Abstract interface contract for technical indicators."""
 
 from abc import ABC, abstractmethod
+
 from yukinoaaa.domain.indicators.models import IndicatorValue
 from yukinoaaa.domain.market.models import Kline
 

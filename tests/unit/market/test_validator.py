@@ -1,7 +1,8 @@
 """Tests for market data validator."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+
 from yukinoaaa.application.market.validator import MarketValidator
 from yukinoaaa.domain.market.models import Kline, Tick
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger
@@ -28,7 +29,7 @@ def test_validator_tick_integrity() -> None:
         symbol="BTC/USDT",
         price=Decimal("100"),
         volume=Decimal("1"),
-        timestamp=datetime.now(timezone.utc) + timedelta(minutes=5),
+        timestamp=datetime.now(UTC) + timedelta(minutes=5),
     )
     assert validator.validate_tick(future_tick) is False
 
@@ -38,7 +39,7 @@ def test_validator_kline_integrity() -> None:
     logger = StructlogLogger()
     validator = MarketValidator(logger=logger)
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     invalid_kline = Kline(
         symbol="BTC/USDT",
         timeframe="1m",

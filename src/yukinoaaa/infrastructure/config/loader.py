@@ -1,8 +1,10 @@
 """Configuration loader implementation using Pydantic Settings."""
 
 from typing import Any
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
 from yukinoaaa.application.interfaces.config import IConfig
 
 

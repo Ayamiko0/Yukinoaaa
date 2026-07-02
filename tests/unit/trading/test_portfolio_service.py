@@ -1,9 +1,11 @@
 """Tests for Portfolio Service orchestrator."""
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.application.trading.portfolio_service import PortfolioService
 from yukinoaaa.domain.events import DomainEvent
 from yukinoaaa.domain.market.events import TickReceivedEvent
@@ -48,7 +50,7 @@ async def test_portfolio_service_tick_updates_and_events() -> None:
         TickReceivedEvent(
             event_type="TickReceived",
             payload={"symbol": "BTC/USDT", "price": "96000", "volume": "0.5"},
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
     )
     await asyncio.sleep(0.05)

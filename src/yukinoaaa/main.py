@@ -1,9 +1,8 @@
 """Production runtime bootstrapper and application lifecycle orchestrator."""
 
 import asyncio
-from decimal import Decimal
 import signal
-from typing import Any
+
 from yukinoaaa.application.backtest.orchestrator import BacktestOrchestrator
 from yukinoaaa.application.execution.manager import OrderManager
 from yukinoaaa.application.execution.router import OrderRouter
@@ -21,12 +20,11 @@ from yukinoaaa.application.trading.strategy_engine import StrategyEngine
 from yukinoaaa.domain.events import DomainEvent
 from yukinoaaa.domain.market.events import KlineReceivedEvent, TickReceivedEvent
 from yukinoaaa.domain.risk.models import RiskPolicy
-from yukinoaaa.domain.trading.models import PositionSide
 from yukinoaaa.infrastructure.cache.redis_cache import RedisCache
+from yukinoaaa.infrastructure.config.loader import Settings
 from yukinoaaa.infrastructure.events.event_bus import AsyncEventBus
 from yukinoaaa.infrastructure.exchange.mock_adapter import MockExchangeAdapter
 from yukinoaaa.infrastructure.execution.fill_simulator import FillSimulator
-from yukinoaaa.infrastructure.config.loader import Settings
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger
 from yukinoaaa.presentation.api.server import AsyncApiServer
 

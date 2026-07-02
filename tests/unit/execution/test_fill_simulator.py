@@ -1,9 +1,11 @@
 """Tests for real-time Fill Simulator."""
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.domain.events import DomainEvent
 from yukinoaaa.domain.execution.models import ExecutionState
 from yukinoaaa.domain.market.events import TickReceivedEvent
@@ -46,7 +48,7 @@ async def test_fill_simulator_matches_limit_order_on_tick() -> None:
         TickReceivedEvent(
             event_type="TickReceived",
             payload={"symbol": "ETH/USDT", "price": "95.0"},
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
     )
     await asyncio.sleep(0.05)
@@ -58,7 +60,7 @@ async def test_fill_simulator_matches_limit_order_on_tick() -> None:
         TickReceivedEvent(
             event_type="TickReceived",
             payload={"symbol": "ETH/USDT", "price": "89.5"},
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
     )
     await asyncio.sleep(0.05)

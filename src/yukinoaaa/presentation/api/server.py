@@ -1,17 +1,23 @@
 """Zero-dependency asynchronous HTTP and Server-Sent Events (SSE) API Gateway server."""
 
 import asyncio
-from datetime import datetime, timedelta, timezone
-from decimal import Decimal
 import json
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
+
 from yukinoaaa.application.backtest.orchestrator import BacktestOrchestrator
 from yukinoaaa.application.interfaces.logger import ILogger
 from yukinoaaa.application.trading.portfolio_service import PortfolioService
 from yukinoaaa.domain.backtest.models import BacktestConfig
 from yukinoaaa.domain.market.models import Kline
-from yukinoaaa.presentation.api.models import ApiResponse, BacktestRequest, PortfolioResponse, PositionSnapshot
+from yukinoaaa.presentation.api.models import (
+    ApiResponse,
+    BacktestRequest,
+    PortfolioResponse,
+    PositionSnapshot,
+)
 
 
 class AsyncApiServer:
@@ -64,7 +70,7 @@ class AsyncApiServer:
         if not self._sse_clients:
             return
         payload_str = json.dumps(data, default=str)
-        message = f"event: {event_type}\ndata: {payload_str}\n\n".encode("utf-8")
+        message = f"event: {event_type}\ndata: {payload_str}\n\n".encode()
         disconnected: set[asyncio.StreamWriter] = set()
 
         for client in self._sse_clients:
@@ -184,7 +190,7 @@ class AsyncApiServer:
             await self._send_json(writer, 400, ApiResponse(status="error", error=f"Invalid request payload: {e}").model_dump())
             return
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         config = BacktestConfig(
             symbol=req.symbol,
             timeframe=req.timeframe,
@@ -218,19 +224,19 @@ class AsyncApiServer:
     async def _handle_sse_stream(self, writer: asyncio.StreamWriter) -> None:
         """Register connection for Server-Sent Events live streaming."""
         headers = (
-            "HTTP/1.1 200 OK\r\n"
-            "Content-Type: text/event-stream\r\n"
-            "Cache-Control: no-cache\r\n"
-            "Connection: keep-alive\r\n"
-            "Access-Control-Allow-Origin: *\r\n"
-            "\r\n"
-        ).encode("utf-8")
+            b"HTTP/1.1 200 OK\r\n"
+            b"Content-Type: text/event-stream\r\n"
+            b"Cache-Control: no-cache\r\n"
+            b"Connection: keep-alive\r\n"
+            b"Access-Control-Allow-Origin: *\r\n"
+            b"\r\n"
+        )
         writer.write(headers)
         await writer.drain()
         self._sse_clients.add(writer)
 
         # Send initial connected event
-        init_msg = f"event: connected\ndata: {json.dumps({'status': 'SSE streaming live'})}\n\n".encode("utf-8")
+        init_msg = f"event: connected\ndata: {json.dumps({'status': 'SSE streaming live'})}\n\n".encode()
         writer.write(init_msg)
         await writer.drain()
 
@@ -262,7 +268,7 @@ class AsyncApiServer:
             f"Content-Length: {len(content)}\r\n"
             f"Connection: close\r\n"
             f"\r\n"
-        ).encode("utf-8")
+        ).encode()
         writer.write(headers + content)
         await writer.drain()
 
@@ -277,6 +283,6 @@ class AsyncApiServer:
             f"Access-Control-Allow-Origin: *\r\n"
             f"Connection: close\r\n"
             f"\r\n"
-        ).encode("utf-8")
+        ).encode()
         writer.write(headers + body)
         await writer.drain()

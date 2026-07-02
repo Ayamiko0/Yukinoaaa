@@ -1,6 +1,7 @@
 """Tests for cache implementation."""
 
 import pytest
+
 from yukinoaaa.infrastructure.cache.redis_cache import RedisCache
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger
 

@@ -1,15 +1,17 @@
 """Tests for SMA and EMA indicator implementations."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.application.indicators.ema import EMA
 from yukinoaaa.application.indicators.sma import SMA
 from yukinoaaa.domain.market.models import Kline
 
 
 def _make_kline(close: str, minutes_ago: int = 0) -> Kline:
-    now = datetime.now(timezone.utc) - timedelta(minutes=minutes_ago)
+    now = datetime.now(UTC) - timedelta(minutes=minutes_ago)
     val = Decimal(close)
     return Kline(
         symbol="BTC/USDT",

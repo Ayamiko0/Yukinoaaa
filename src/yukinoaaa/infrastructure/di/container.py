@@ -12,7 +12,7 @@ class Container:
     def __init__(self) -> None:
         """Initialize registries for singletons and factories."""
         self._singletons: dict[type[Any] | str, Any] = {}
-        self._factories: dict[type[Any] | str, Callable[["Container"], Any]] = {}
+        self._factories: dict[type[Any] | str, Callable[[Container], Any]] = {}
 
     def register_singleton(self, key: type[T] | str, instance: T) -> None:
         """Register a pre-constructed singleton object."""

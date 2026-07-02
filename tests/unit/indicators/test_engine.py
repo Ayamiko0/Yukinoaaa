@@ -1,9 +1,11 @@
 """Tests for technical indicator engine orchestrator."""
 
 import asyncio
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.application.indicators.engine import IndicatorEngine
 from yukinoaaa.application.indicators.sma import SMA
 from yukinoaaa.domain.events import DomainEvent
@@ -31,7 +33,7 @@ async def test_indicator_engine_event_orchestration() -> None:
     await bus.subscribe("IndicatorUpdated", on_indicator_updated)
     await engine.start()
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     # Emit 1st kline
     await bus.publish(
         KlineReceivedEvent(

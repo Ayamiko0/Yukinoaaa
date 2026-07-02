@@ -1,8 +1,10 @@
 """Tests for MACD, Bollinger Bands, and ATR indicators."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.application.indicators.atr import ATR
 from yukinoaaa.application.indicators.bollinger import BollingerBands
 from yukinoaaa.application.indicators.macd import MACD
@@ -10,7 +12,7 @@ from yukinoaaa.domain.market.models import Kline
 
 
 def _make_kline(high: str, low: str, close: str, minutes_ago: int = 0) -> Kline:
-    now = datetime.now(timezone.utc) - timedelta(minutes=minutes_ago)
+    now = datetime.now(UTC) - timedelta(minutes=minutes_ago)
     h, l, c = Decimal(high), Decimal(low), Decimal(close)
     return Kline(
         symbol="BTC/USDT",

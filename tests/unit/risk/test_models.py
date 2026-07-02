@@ -1,7 +1,9 @@
 """Tests for risk domain models and policy validation."""
 
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.domain.exceptions import ValidationException
 from yukinoaaa.domain.risk.models import RiskDecision, RiskPolicy, RiskReport, RiskStatus
 

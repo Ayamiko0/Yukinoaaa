@@ -1,11 +1,13 @@
 """Trading domain models: Order, Position, Portfolio, and TradeSignal."""
 
-from datetime import datetime, timezone
+import uuid
+from datetime import UTC, datetime
 from decimal import Decimal
 from enum import Enum
 from typing import Any
-import uuid
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+
+from pydantic import BaseModel, ConfigDict, Field
+
 from yukinoaaa.domain.exceptions import ValidationException
 
 
@@ -49,7 +51,7 @@ class Order(BaseModel):
     quantity: Decimal = Field(..., gt=0, description="Order volume quantity")
     filled_quantity: Decimal = Field(default=Decimal("0"), ge=0)
     average_fill_price: Decimal | None = Field(default=None)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     model_config = ConfigDict(validate_assignment=True)
@@ -66,7 +68,7 @@ class Position(BaseModel):
     leverage: Decimal = Field(default=Decimal("1.0"), ge=1.0)
     unrealized_pnl: Decimal = Field(default=Decimal("0.0"))
     realized_pnl: Decimal = Field(default=Decimal("0.0"))
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     model_config = ConfigDict(validate_assignment=True)
 
@@ -92,7 +94,7 @@ class TradeSignal(BaseModel):
     confidence: float = Field(default=1.0, ge=0.0, le=1.0, description="Signal confidence score between 0 and 1")
     target_price: Decimal | None = Field(default=None)
     stop_loss: Decimal | None = Field(default=None)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     model_config = ConfigDict(frozen=True)

@@ -1,7 +1,9 @@
 """Tests for technical indicator domain models."""
 
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.domain.indicators.models import IndicatorValue
 
 

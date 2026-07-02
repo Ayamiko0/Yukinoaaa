@@ -2,7 +2,9 @@
 
 import json
 from typing import Any
+
 import redis.asyncio as redis
+
 from yukinoaaa.application.interfaces.cache import ICache
 from yukinoaaa.application.interfaces.logger import ILogger
 

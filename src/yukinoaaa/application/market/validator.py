@@ -1,7 +1,8 @@
 """Market Data Validator for integrity and sanity checks."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+
 from yukinoaaa.application.interfaces.logger import ILogger
 from yukinoaaa.domain.exceptions import ValidationException
 from yukinoaaa.domain.market.models import Kline, Tick
@@ -33,8 +34,8 @@ class MarketValidator:
                 if tick.bid > tick.ask:
                     raise ValidationException(f"Crossed orderbook in tick: bid {tick.bid} > ask {tick.ask}")
 
-            now = datetime.now(timezone.utc)
-            tick_time = tick.timestamp.astimezone(timezone.utc)
+            now = datetime.now(UTC)
+            tick_time = tick.timestamp.astimezone(UTC)
             if tick_time - now > self._max_future_drift:
                 raise ValidationException(f"Tick timestamp too far in future: {tick.timestamp}")
             if now - tick_time > self._max_past_drift:

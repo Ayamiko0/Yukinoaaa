@@ -1,6 +1,7 @@
 """Abstract interface contract for trading execution adapters."""
 
 from abc import ABC, abstractmethod
+
 from yukinoaaa.domain.execution.models import ExecutionReport
 from yukinoaaa.domain.trading.models import Order
 

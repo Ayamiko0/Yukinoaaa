@@ -4,7 +4,9 @@ import asyncio
 import json
 import socket
 from urllib.request import Request, urlopen
+
 import pytest
+
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger
 from yukinoaaa.presentation.api.server import AsyncApiServer
 

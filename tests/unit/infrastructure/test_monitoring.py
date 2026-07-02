@@ -1,6 +1,7 @@
 """Tests for monitoring and health check service."""
 
 import pytest
+
 from yukinoaaa.infrastructure.cache.redis_cache import RedisCache
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger
 from yukinoaaa.infrastructure.monitoring.health import HealthCheckService

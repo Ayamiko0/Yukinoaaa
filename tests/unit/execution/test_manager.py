@@ -1,9 +1,11 @@
 """Tests for Order Manager state synchronization engine."""
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.application.execution.manager import OrderManager
 from yukinoaaa.application.trading.portfolio_service import PortfolioService
 from yukinoaaa.domain.events import DomainEvent
@@ -67,7 +69,7 @@ async def test_order_manager_synchronizes_state_and_opens_position() -> None:
                 "average_price": "150.0",
                 "fee": "0.6",
             },
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
     )
     await asyncio.sleep(0.05)
@@ -89,7 +91,7 @@ async def test_order_manager_synchronizes_state_and_opens_position() -> None:
                 "average_price": "150.0",
                 "fee": "1.5",
             },
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
     )
     await asyncio.sleep(0.05)

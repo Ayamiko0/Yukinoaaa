@@ -1,7 +1,9 @@
 """Tests for asynchronous event bus."""
 
 import asyncio
+
 import pytest
+
 from yukinoaaa.domain.events import DomainEvent
 from yukinoaaa.infrastructure.events.event_bus import AsyncEventBus
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger

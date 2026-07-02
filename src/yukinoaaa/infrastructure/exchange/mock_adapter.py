@@ -1,12 +1,13 @@
 """Mock / Simulated Exchange Adapter for testing and 24/7 standalone paper trading."""
 
 import asyncio
-from datetime import datetime, timedelta, timezone
-from decimal import Decimal
 import random
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
+
 from yukinoaaa.application.interfaces.exchange import IExchangeAdapter, TickCallback
 from yukinoaaa.application.interfaces.logger import ILogger
-from yukinoaaa.domain.exceptions import InfrastructureException, ResourceNotFoundException
+from yukinoaaa.domain.exceptions import InfrastructureException
 from yukinoaaa.domain.market.models import Kline, OrderBook, OrderBookEntry, Tick
 
 
@@ -81,7 +82,7 @@ class MockExchangeAdapter(IExchangeAdapter):
             volume=Decimal(str(round(random.uniform(0.1, 10.0), 4))),
             bid=price - spread,
             ask=price + spread,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             exchange=self.exchange_id,
         )
 
@@ -94,7 +95,7 @@ class MockExchangeAdapter(IExchangeAdapter):
         duration = timedelta(minutes=tf_minutes)
 
         klines: list[Kline] = []
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         # Round close time to minute
         close_time = now.replace(second=0, microsecond=0)
 
@@ -147,7 +148,7 @@ class MockExchangeAdapter(IExchangeAdapter):
 
         return OrderBook(
             symbol=std_sym,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             bids=bids,
             asks=asks,
             exchange=self.exchange_id,
@@ -212,7 +213,7 @@ class MockExchangeAdapter(IExchangeAdapter):
                         volume=Decimal(str(round(random.uniform(0.1, 5.0), 4))),
                         bid=price - spread,
                         ask=price + spread,
-                        timestamp=datetime.now(timezone.utc),
+                        timestamp=datetime.now(UTC),
                         exchange=self.exchange_id,
                     )
                     for cb in list(callbacks):

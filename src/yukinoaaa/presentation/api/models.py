@@ -1,8 +1,9 @@
 """API data transfer models for requests and responses."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -11,7 +12,7 @@ class ApiResponse(BaseModel):
     status: str = Field(default="success", description="success or error")
     data: Any | None = Field(default=None)
     error: str | None = Field(default=None)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     model_config = ConfigDict(frozen=True)
 
@@ -36,7 +37,7 @@ class PortfolioResponse(BaseModel):
     total_equity: Decimal = Field(...)
     positions: list[PositionSnapshot] = Field(default_factory=list)
     active_orders_count: int = Field(default=0, ge=0)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     model_config = ConfigDict(frozen=True)
 

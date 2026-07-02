@@ -2,12 +2,17 @@
 
 from decimal import Decimal
 from typing import Any
+
 from yukinoaaa.application.interfaces.event_bus import IEventBus
 from yukinoaaa.application.interfaces.logger import ILogger
 from yukinoaaa.application.risk.validator import RiskValidator
 from yukinoaaa.application.trading.portfolio_service import PortfolioService
 from yukinoaaa.domain.events import DomainEvent
-from yukinoaaa.domain.risk.events import RiskEvaluatedEvent, RiskLimitExceededEvent, TradingHaltedEvent
+from yukinoaaa.domain.risk.events import (
+    RiskEvaluatedEvent,
+    RiskLimitExceededEvent,
+    TradingHaltedEvent,
+)
 from yukinoaaa.domain.risk.models import RiskDecision, RiskPolicy, RiskReport, RiskStatus
 from yukinoaaa.domain.trading.events import OrderCreatedEvent
 from yukinoaaa.domain.trading.models import Order, OrderType

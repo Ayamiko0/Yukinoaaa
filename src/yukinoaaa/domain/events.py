@@ -4,9 +4,10 @@ Events represent state changes or significant occurrences within the domain.
 They form the backbone of the Event-Driven Architecture (EDA).
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID, uuid4
+
 from pydantic import BaseModel, Field
 
 
@@ -15,7 +16,7 @@ class DomainEvent(BaseModel):
 
     event_id: UUID = Field(default_factory=uuid4, description="Unique identifier for the event")
     timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         description="UTC timestamp when the event occurred",
     )
     event_type: str = Field(..., description="Name/type of the event")

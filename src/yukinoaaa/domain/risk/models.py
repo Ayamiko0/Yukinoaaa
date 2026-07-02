@@ -1,11 +1,13 @@
 """Risk domain models: RiskPolicy, RiskDecision, RiskReport, and RiskStatus."""
 
-from datetime import datetime, timezone
+import uuid
+from datetime import UTC, datetime
 from decimal import Decimal
 from enum import Enum
 from typing import Any
-import uuid
+
 from pydantic import BaseModel, ConfigDict, Field
+
 from yukinoaaa.domain.exceptions import ValidationException
 
 
@@ -58,7 +60,7 @@ class RiskDecision(BaseModel):
     approved_leverage: Decimal | None = Field(default=None, ge=1.0)
     target_price: Decimal | None = Field(default=None)
     stop_loss: Decimal | None = Field(default=None)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     model_config = ConfigDict(frozen=True)
@@ -73,6 +75,6 @@ class RiskReport(BaseModel):
     current_drawdown_percent: Decimal = Field(..., ge=0)
     daily_loss_percent: Decimal = Field(...)
     is_trading_halted: bool = Field(default=False)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     model_config = ConfigDict(frozen=True)

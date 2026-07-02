@@ -1,8 +1,10 @@
 """Tests for market data domain models."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.domain.market.models import Kline, OrderBook, OrderBookEntry, Symbol, Tick
 
 
@@ -32,7 +34,7 @@ def test_tick_validation() -> None:
 
 def test_kline_validation() -> None:
     """Verify kline high/low relationship."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     kline = Kline(
         symbol="BTC/USDT",
         timeframe="1m",

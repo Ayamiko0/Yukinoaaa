@@ -1,14 +1,16 @@
 """Tests for Relative Strength Index (RSI) indicator."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.application.indicators.rsi import RSI
 from yukinoaaa.domain.market.models import Kline
 
 
 def _make_kline(close: str, minutes_ago: int = 0) -> Kline:
-    now = datetime.now(timezone.utc) - timedelta(minutes=minutes_ago)
+    now = datetime.now(UTC) - timedelta(minutes=minutes_ago)
     val = Decimal(close)
     return Kline(
         symbol="BTC/USDT",

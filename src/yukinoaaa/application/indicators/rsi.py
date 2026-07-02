@@ -1,6 +1,7 @@
 """Relative Strength Index (RSI) implementation with Wilder's smoothing."""
 
 from decimal import Decimal
+
 from yukinoaaa.application.interfaces.indicator import IIndicator
 from yukinoaaa.domain.indicators.models import IndicatorValue
 from yukinoaaa.domain.market.models import Kline

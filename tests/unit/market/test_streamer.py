@@ -2,13 +2,14 @@
 
 import asyncio
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.application.market.cache_service import MarketCacheService
 from yukinoaaa.application.market.normalizer import MarketNormalizer
 from yukinoaaa.application.market.streamer import MarketDataStreamer
 from yukinoaaa.application.market.validator import MarketValidator
 from yukinoaaa.domain.events import DomainEvent
-from yukinoaaa.domain.market.models import Tick
 from yukinoaaa.infrastructure.cache.redis_cache import RedisCache
 from yukinoaaa.infrastructure.events.event_bus import AsyncEventBus
 from yukinoaaa.infrastructure.exchange.mock_adapter import MockExchangeAdapter

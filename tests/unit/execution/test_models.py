@@ -1,7 +1,9 @@
 """Tests for execution domain models."""
 
 from decimal import Decimal
+
 import pytest
+
 from yukinoaaa.domain.execution.models import ExecutionReport, ExecutionState
 
 

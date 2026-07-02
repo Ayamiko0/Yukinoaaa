@@ -1,6 +1,7 @@
 """Historical Replay Engine pumping sequential klines and ticks into the Event Bus."""
 
 import asyncio
+
 from yukinoaaa.application.interfaces.event_bus import IEventBus
 from yukinoaaa.application.interfaces.logger import ILogger
 from yukinoaaa.domain.market.events import KlineReceivedEvent, TickReceivedEvent

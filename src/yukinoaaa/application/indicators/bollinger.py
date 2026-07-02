@@ -1,8 +1,9 @@
 """Bollinger Bands indicator implementation."""
 
+import math
 from collections import deque
 from decimal import Decimal
-import math
+
 from yukinoaaa.application.interfaces.indicator import IIndicator
 from yukinoaaa.domain.indicators.models import IndicatorValue
 from yukinoaaa.domain.market.models import Kline
