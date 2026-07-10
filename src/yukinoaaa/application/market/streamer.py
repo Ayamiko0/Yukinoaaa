@@ -1,6 +1,7 @@
 """Market Data Streamer orchestrator with automatic exponential backoff reconnection."""
 
 import asyncio
+import contextlib
 
 from yukinoaaa.application.interfaces.event_bus import IEventBus
 from yukinoaaa.application.interfaces.exchange import IExchangeAdapter
@@ -58,10 +59,8 @@ class MarketDataStreamer:
         self._running = False
         if self._reconnect_task and not self._reconnect_task.done():
             self._reconnect_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._reconnect_task
-            except asyncio.CancelledError:
-                pass
         try:
             await self._adapter.unsubscribe_ticks(self._subscribed_symbols)
             await self._adapter.disconnect()
@@ -87,7 +86,9 @@ class MarketDataStreamer:
         try:
             await self._cache_service.process_tick(normalized)
         except Exception as e:
-            self._logger.error("Error processing tick in cache service", symbol=tick.symbol, error=str(e))
+            self._logger.error(
+                "Error processing tick in cache service", symbol=tick.symbol, error=str(e)
+            )
             self._trigger_reconnect("Cache service processing error")
 
     async def _connect_and_subscribe(self) -> None:
@@ -134,7 +135,9 @@ class MarketDataStreamer:
                 self._normalizer.reset_state(exchange=self._adapter.exchange_id)
                 await self._adapter.disconnect()
                 await self._adapter.connect()
-                await self._adapter.subscribe_ticks(self._subscribed_symbols, self._on_tick_callback)
+                await self._adapter.subscribe_ticks(
+                    self._subscribed_symbols, self._on_tick_callback
+                )
 
                 self._logger.info("Stream successfully reconnected", attempt=attempt)
                 await self._event_bus.publish(

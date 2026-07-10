@@ -3,7 +3,7 @@
 import uuid
 from datetime import UTC, datetime
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -11,22 +11,25 @@ from pydantic import BaseModel, ConfigDict, Field
 from yukinoaaa.domain.exceptions import ValidationException
 
 
-class OrderSide(str, Enum):
+class OrderSide(StrEnum):
     """Side of order or trade signal."""
+
     BUY = "BUY"
     SELL = "SELL"
 
 
-class OrderType(str, Enum):
+class OrderType(StrEnum):
     """Type of trading order."""
+
     MARKET = "MARKET"
     LIMIT = "LIMIT"
     STOP_LOSS = "STOP_LOSS"
     TAKE_PROFIT = "TAKE_PROFIT"
 
 
-class OrderStatus(str, Enum):
+class OrderStatus(StrEnum):
     """Lifecycle status of a trading order."""
+
     PENDING = "PENDING"
     OPEN = "OPEN"
     FILLED = "FILLED"
@@ -34,14 +37,16 @@ class OrderStatus(str, Enum):
     REJECTED = "REJECTED"
 
 
-class PositionSide(str, Enum):
+class PositionSide(StrEnum):
     """Direction of an active trading position."""
+
     LONG = "LONG"
     SHORT = "SHORT"
 
 
 class Order(BaseModel):
     """Entity representing a trading order sent to an exchange or simulation."""
+
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     symbol: str = Field(..., description="Standardized symbol, e.g. 'BTC/USDT'")
     side: OrderSide = Field(...)
@@ -59,6 +64,7 @@ class Order(BaseModel):
 
 class Position(BaseModel):
     """Entity representing an open trading position with real-time PnL tracking."""
+
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     symbol: str = Field(..., description="Standardized symbol, e.g. 'BTC/USDT'")
     side: PositionSide = Field(...)
@@ -86,12 +92,15 @@ class Position(BaseModel):
 
 class TradeSignal(BaseModel):
     """Immutable value object representing a quantitative trade setup emitted by a strategy."""
+
     signal_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     symbol: str = Field(...)
     timeframe: str = Field(...)
     side: OrderSide = Field(...)
     strategy_name: str = Field(...)
-    confidence: float = Field(default=1.0, ge=0.0, le=1.0, description="Signal confidence score between 0 and 1")
+    confidence: float = Field(
+        default=1.0, ge=0.0, le=1.0, description="Signal confidence score between 0 and 1"
+    )
     target_price: Decimal | None = Field(default=None)
     stop_loss: Decimal | None = Field(default=None)
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
@@ -102,10 +111,13 @@ class TradeSignal(BaseModel):
 
 class Portfolio(BaseModel):
     """Aggregate Root managing account balance, margin, and active positions."""
+
     account_id: str = Field(...)
     available_balance: Decimal = Field(..., ge=0)
     margin_used: Decimal = Field(default=Decimal("0.0"), ge=0)
-    positions: dict[str, Position] = Field(default_factory=dict, description="Mapping: symbol -> active Position")
+    positions: dict[str, Position] = Field(
+        default_factory=dict, description="Mapping: symbol -> active Position"
+    )
     orders: dict[str, Order] = Field(default_factory=dict, description="Mapping: order_id -> Order")
 
     model_config = ConfigDict(validate_assignment=True)
@@ -141,7 +153,7 @@ class Portfolio(BaseModel):
 
         # Return margin used for this position and add realized PnL
         # Simplified margin return calculation assuming proportional release
-        self.available_balance += (self.margin_used + final_pnl)
+        self.available_balance += self.margin_used + final_pnl
         pos.realized_pnl += final_pnl
         pos.unrealized_pnl = Decimal("0.0")
         self.margin_used = Decimal("0.0") if not self.positions else self.margin_used

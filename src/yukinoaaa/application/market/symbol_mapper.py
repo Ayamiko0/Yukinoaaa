@@ -37,7 +37,9 @@ class SymbolMapper:
         # Default heuristic: strip slash for crypto/forex if unmapped
         return std_str.replace("/", "")
 
-    def to_standard_symbol(self, exchange_id: str, raw_symbol: str, default_quote: str = "USDT") -> str:
+    def to_standard_symbol(
+        self, exchange_id: str, raw_symbol: str, default_quote: str = "USDT"
+    ) -> str:
         """Convert an exchange raw symbol string back to standard notation (e.g., 'BTC/USDT')."""
         raw = raw_symbol.strip()
         exchange_map = self._to_standard.get(exchange_id, {})

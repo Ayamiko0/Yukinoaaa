@@ -43,7 +43,9 @@ class StrategyEngine:
         key = (strategy.symbol.strip().upper(), strategy.timeframe.strip().lower())
         if strategy not in self._strategies[key]:
             self._strategies[key].append(strategy)
-            self._logger.info("Registered strategy plugin", name=strategy.name, symbol=key[0], timeframe=key[1])
+            self._logger.info(
+                "Registered strategy plugin", name=strategy.name, symbol=key[0], timeframe=key[1]
+            )
 
     async def _on_indicator_updated(self, event: DomainEvent) -> None:
         """Event bus handler triggered when a technical indicator is updated."""
@@ -71,7 +73,9 @@ class StrategyEngine:
                 if signal is not None:
                     await self._emit_signal(signal)
             except Exception as e:
-                self._logger.error("Error evaluating strategy", strategy=strat.name, symbol=sym, error=str(e))
+                self._logger.error(
+                    "Error evaluating strategy", strategy=strat.name, symbol=sym, error=str(e)
+                )
 
     async def _emit_signal(self, signal: TradeSignal) -> None:
         """Publish SignalCreatedEvent over Event Bus."""

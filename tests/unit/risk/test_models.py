@@ -3,6 +3,7 @@
 from decimal import Decimal
 
 import pytest
+from pydantic import ValidationError
 
 from yukinoaaa.domain.exceptions import ValidationException
 from yukinoaaa.domain.risk.models import RiskDecision, RiskPolicy, RiskReport, RiskStatus
@@ -16,16 +17,20 @@ def test_risk_policy_validation_and_defaults() -> None:
     policy.validate_policy()
 
     with pytest.raises(ValidationException):
-        invalid_policy = RiskPolicy(max_risk_per_trade_percent=Decimal("0.10"), max_daily_loss_percent=Decimal("0.05"))
+        invalid_policy = RiskPolicy(
+            max_risk_per_trade_percent=Decimal("0.10"), max_daily_loss_percent=Decimal("0.05")
+        )
         invalid_policy.validate_policy()
 
 
 def test_risk_decision_and_report_immutability() -> None:
     """Verify RiskDecision and RiskReport models are frozen objects."""
-    dec = RiskDecision(status=RiskStatus.APPROVED, signal_id="sig_001", approved_quantity=Decimal("1.5"))
+    dec = RiskDecision(
+        status=RiskStatus.APPROVED, signal_id="sig_001", approved_quantity=Decimal("1.5")
+    )
     assert dec.status == RiskStatus.APPROVED
 
-    with pytest.raises(Exception):
+    with pytest.raises((ValidationError, AttributeError)):
         dec.status = RiskStatus.REJECTED  # type: ignore
 
     report = RiskReport(

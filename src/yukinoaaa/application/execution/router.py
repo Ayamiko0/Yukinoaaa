@@ -13,7 +13,9 @@ from yukinoaaa.domain.execution.events import ExecutionReportReceivedEvent
 class OrderRouter:
     """Routes OrderCreatedEvent to appropriate execution adapter and publishes execution reports."""
 
-    def __init__(self, portfolio_service: PortfolioService, event_bus: IEventBus, logger: ILogger) -> None:
+    def __init__(
+        self, portfolio_service: PortfolioService, event_bus: IEventBus, logger: ILogger
+    ) -> None:
         """Initialize router with portfolio service, event bus, and adapter registry."""
         self._portfolio_service = portfolio_service
         self._event_bus = event_bus
@@ -22,7 +24,9 @@ class OrderRouter:
         self._default_adapter: str = "MOCK"
         self._running = False
 
-    def register_adapter(self, name: str, adapter: IExecutionAdapter, is_default: bool = False) -> None:
+    def register_adapter(
+        self, name: str, adapter: IExecutionAdapter, is_default: bool = False
+    ) -> None:
         """Register an execution adapter under a unique identifier."""
         name_up = name.upper()
         self._adapters[name_up] = adapter
@@ -69,7 +73,9 @@ class OrderRouter:
 
         try:
             report = await adapter.submit_order(order)
-            self._logger.info("Order submitted to adapter", order_id=order.id, status=report.status.value)
+            self._logger.info(
+                "Order submitted to adapter", order_id=order.id, status=report.status.value
+            )
 
             await self._event_bus.publish(
                 ExecutionReportReceivedEvent(
@@ -82,7 +88,9 @@ class OrderRouter:
                         "filled_quantity": str(report.filled_quantity),
                         "remaining_quantity": str(report.remaining_quantity),
                         "last_price": str(report.last_price) if report.last_price else None,
-                        "average_price": str(report.average_price) if report.average_price else None,
+                        "average_price": str(report.average_price)
+                        if report.average_price
+                        else None,
                         "fee": str(report.fee),
                         "reason": report.reason,
                     },

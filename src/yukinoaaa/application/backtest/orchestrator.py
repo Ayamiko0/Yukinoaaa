@@ -58,7 +58,9 @@ class BacktestOrchestrator:
 
         try:
             # 1. Trading Core (Phase 3B)
-            port_service = PortfolioService(cache, bus, self._logger, default_account_id="acc_backtest")
+            port_service = PortfolioService(
+                cache, bus, self._logger, default_account_id="acc_backtest"
+            )
             self._portfolio_service = port_service
             # Fund initial equity
             port_service.portfolio.available_balance = config.initial_equity
@@ -78,7 +80,9 @@ class BacktestOrchestrator:
             risk_engine = RiskEngine(port_service, validator, policy, bus, self._logger)
 
             # 5. Execution & Order Management Engine (Phase 5)
-            simulator = FillSimulator(bus, self._logger, slippage_rate=config.slippage_rate, fee_rate=config.fee_rate)
+            simulator = FillSimulator(
+                bus, self._logger, slippage_rate=config.slippage_rate, fee_rate=config.fee_rate
+            )
             adapter = MockExecutionAdapter(
                 port_service,
                 fill_simulator=simulator,
@@ -107,7 +111,11 @@ class BacktestOrchestrator:
             await bus.publish(
                 BacktestStartedEvent(
                     event_type="BacktestStarted",
-                    payload={"backtest_id": config.backtest_id, "symbol": config.symbol, "initial_equity": str(config.initial_equity)},
+                    payload={
+                        "backtest_id": config.backtest_id,
+                        "symbol": config.symbol,
+                        "initial_equity": str(config.initial_equity),
+                    },
                 )
             )
 
@@ -150,7 +158,7 @@ class BacktestOrchestrator:
             await bus.stop()
             await cache.close()
 
-    async def _on_kline_received(self, event: DomainEvent) -> None:
+    async def _on_kline_received(self, _event: DomainEvent) -> None:
         """Snapshot current equity on each kline step."""
         if self._portfolio_service:
             self._equity_curve.append(self._portfolio_service.portfolio.total_equity)
@@ -180,8 +188,8 @@ class BacktestOrchestrator:
         """Format a GitHub-styled markdown summary table of backtest results."""
         return f"""# Quantitative Backtest Report
 
-**Symbol:** `{config.symbol}` | **Timeframe:** `{config.timeframe}` | **Strategy:** `{config.strategy_name}`  
-**Period:** `{config.start_time.strftime('%Y-%m-%d %H:%M')}` to `{config.end_time.strftime('%Y-%m-%d %H:%M')}`
+**Symbol:** `{config.symbol}` | **Timeframe:** `{config.timeframe}` | **Strategy:** `{config.strategy_name}`
+**Period:** `{config.start_time.strftime("%Y-%m-%d %H:%M")}` to `{config.end_time.strftime("%Y-%m-%d %H:%M")}`
 
 ## Performance Analytics Summary
 

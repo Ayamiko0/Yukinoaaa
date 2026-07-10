@@ -47,9 +47,13 @@ class IndicatorEngine:
         key = (symbol.strip().upper(), timeframe.strip().lower())
         if indicator not in self._indicators[key]:
             self._indicators[key].append(indicator)
-            self._logger.debug("Registered indicator", symbol=key[0], timeframe=key[1], name=indicator.name)
+            self._logger.debug(
+                "Registered indicator", symbol=key[0], timeframe=key[1], name=indicator.name
+            )
 
-    def get_latest_value(self, symbol: str, timeframe: str, indicator_name: str) -> IndicatorValue | None:
+    def get_latest_value(
+        self, symbol: str, timeframe: str, indicator_name: str
+    ) -> IndicatorValue | None:
         """Retrieve the latest computed IndicatorValue."""
         key = (symbol.strip().upper(), timeframe.strip().lower(), indicator_name)
         return self._latest_values.get(key)
@@ -58,11 +62,7 @@ class IndicatorEngine:
         """Retrieve all current indicator values for a symbol and timeframe."""
         sym = symbol.strip().upper()
         tf = timeframe.strip().lower()
-        return {
-            k[2]: v
-            for k, v in self._latest_values.items()
-            if k[0] == sym and k[1] == tf
-        }
+        return {k[2]: v for k, v in self._latest_values.items() if k[0] == sym and k[1] == tf}
 
     async def _on_kline_received(self, event: DomainEvent) -> None:
         """Event bus handler triggered when a new Kline is updated or closed."""
@@ -115,4 +115,6 @@ class IndicatorEngine:
                         )
                     )
             except Exception as e:
-                self._logger.error("Error calculating indicator", name=ind.name, symbol=sym, error=str(e))
+                self._logger.error(
+                    "Error calculating indicator", name=ind.name, symbol=sym, error=str(e)
+                )

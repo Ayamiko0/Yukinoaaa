@@ -14,8 +14,20 @@ def test_normalizer_deduplication() -> None:
     normalizer = MarketNormalizer(logger=logger)
 
     now = datetime.now(UTC)
-    tick1 = Tick(symbol="btc/usdt", price=Decimal("100"), volume=Decimal("1"), timestamp=now, exchange="binance")
-    tick2 = Tick(symbol="BTC/USDT", price=Decimal("100"), volume=Decimal("1"), timestamp=now, exchange="binance")
+    tick1 = Tick(
+        symbol="btc/usdt",
+        price=Decimal("100"),
+        volume=Decimal("1"),
+        timestamp=now,
+        exchange="binance",
+    )
+    tick2 = Tick(
+        symbol="BTC/USDT",
+        price=Decimal("100"),
+        volume=Decimal("1"),
+        timestamp=now,
+        exchange="binance",
+    )
 
     res1 = normalizer.normalize_and_deduplicate(tick1)
     assert res1 is not None
@@ -31,7 +43,13 @@ def test_normalizer_reset_state() -> None:
     normalizer = MarketNormalizer(logger=logger)
 
     now = datetime.now(UTC)
-    tick = Tick(symbol="BTC/USDT", price=Decimal("100"), volume=Decimal("1"), timestamp=now, exchange="binance")
+    tick = Tick(
+        symbol="BTC/USDT",
+        price=Decimal("100"),
+        volume=Decimal("1"),
+        timestamp=now,
+        exchange="binance",
+    )
     normalizer.normalize_and_deduplicate(tick)
 
     normalizer.reset_state(symbol="BTC/USDT", exchange="binance")

@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import Generic, TypeVar
+from typing import TypeVar
 
 T = TypeVar("T")
 ID = TypeVar("ID")
@@ -27,7 +27,7 @@ class IDatabase(ABC):
         ...
 
 
-class IRepository(ABC, Generic[T, ID]):
+class IRepository[T, ID](ABC):
     """Generic abstract repository interface for domain aggregates and entities."""
 
     @abstractmethod

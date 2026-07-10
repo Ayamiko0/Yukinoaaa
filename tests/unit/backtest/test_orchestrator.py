@@ -29,8 +29,28 @@ async def test_backtest_orchestrator_execution_and_markdown_report() -> None:
     )
 
     klines = [
-        Kline(symbol="SOL/USDT", timeframe="1m", open_time=now, close_time=now + timedelta(seconds=59), open=Decimal("100"), high=Decimal("152"), low=Decimal("149"), close=Decimal("151"), volume=Decimal("100")),
-        Kline(symbol="SOL/USDT", timeframe="1m", open_time=now + timedelta(minutes=1), close_time=now + timedelta(minutes=1, seconds=59), open=Decimal("151"), high=Decimal("155"), low=Decimal("150"), close=Decimal("154"), volume=Decimal("120")),
+        Kline(
+            symbol="SOL/USDT",
+            timeframe="1m",
+            open_time=now,
+            close_time=now + timedelta(seconds=59),
+            open=Decimal("100"),
+            high=Decimal("152"),
+            low=Decimal("149"),
+            close=Decimal("151"),
+            volume=Decimal("100"),
+        ),
+        Kline(
+            symbol="SOL/USDT",
+            timeframe="1m",
+            open_time=now + timedelta(minutes=1),
+            close_time=now + timedelta(minutes=1, seconds=59),
+            open=Decimal("151"),
+            high=Decimal("155"),
+            low=Decimal("150"),
+            close=Decimal("154"),
+            volume=Decimal("120"),
+        ),
     ]
 
     metrics = await orchestrator.run_backtest(config, klines)

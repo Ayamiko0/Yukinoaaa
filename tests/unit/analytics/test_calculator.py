@@ -70,4 +70,6 @@ def test_performance_calculator_metrics_accuracy() -> None:
     assert metrics.max_drawdown_amount == Decimal("5.0000")
     assert metrics.max_drawdown_percentage == Decimal("0.0455")
     assert metrics.sharpe_ratio > Decimal("0")
-    assert metrics.sortino_ratio >= metrics.sharpe_ratio  # Sortino penalizes only downside volatility
+    assert (
+        metrics.sortino_ratio >= metrics.sharpe_ratio
+    )  # Sortino penalizes only downside volatility

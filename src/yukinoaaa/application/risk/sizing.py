@@ -24,7 +24,9 @@ class PositionCalculator:
             tuple[Decimal, Decimal]: (approved_quantity, final_stop_loss)
         """
         if equity <= Decimal("0") or entry_price <= Decimal("0"):
-            raise ValidationException("Equity and entry price must be positive for sizing calculation")
+            raise ValidationException(
+                "Equity and entry price must be positive for sizing calculation"
+            )
 
         # Determine effective stop-loss if omitted
         final_stop_loss = stop_loss

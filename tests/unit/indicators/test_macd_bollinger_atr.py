@@ -13,16 +13,16 @@ from yukinoaaa.domain.market.models import Kline
 
 def _make_kline(high: str, low: str, close: str, minutes_ago: int = 0) -> Kline:
     now = datetime.now(UTC) - timedelta(minutes=minutes_ago)
-    h, l, c = Decimal(high), Decimal(low), Decimal(close)
+    high_dec, low_dec, close_dec = Decimal(high), Decimal(low), Decimal(close)
     return Kline(
         symbol="BTC/USDT",
         timeframe="1m",
         open_time=now - timedelta(minutes=1),
         close_time=now,
-        open=l,
-        high=h,
-        low=l,
-        close=c,
+        open=low_dec,
+        high=high_dec,
+        low=low_dec,
+        close=close_dec,
     )
 
 

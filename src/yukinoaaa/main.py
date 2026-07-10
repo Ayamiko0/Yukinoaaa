@@ -64,7 +64,9 @@ class ApplicationOrchestrator:
         # Market Data Layer
         self._validator = MarketValidator(logger=self._logger)
         self._normalizer = MarketNormalizer(logger=self._logger)
-        self._cache_service = MarketCacheService(cache=self._cache, event_bus=self._event_bus, logger=self._logger)
+        self._cache_service = MarketCacheService(
+            cache=self._cache, event_bus=self._event_bus, logger=self._logger
+        )
         self._streamer = MarketDataStreamer(
             adapter=self._exchange,
             cache_service=self._cache_service,
@@ -81,7 +83,9 @@ class ApplicationOrchestrator:
         # Risk Layer
         self._policy = RiskPolicy()
         self._sizing_calc = PositionCalculator()
-        self._risk_validator = RiskValidator(policy=self._policy, sizing_calculator=self._sizing_calc)
+        self._risk_validator = RiskValidator(
+            policy=self._policy, sizing_calculator=self._sizing_calc
+        )
         self._risk_engine = RiskEngine(
             portfolio_service=self._portfolio_service,
             validator=self._risk_validator,
@@ -113,7 +117,9 @@ class ApplicationOrchestrator:
         # Discord Integration Layer
         settings = Settings()
         if settings.discord_webhook_url:
-            self._discord_adapter = DiscordWebhookAdapter(webhook_url=settings.discord_webhook_url, logger=self._logger)
+            self._discord_adapter = DiscordWebhookAdapter(
+                webhook_url=settings.discord_webhook_url, logger=self._logger
+            )
         else:
             self._discord_adapter = MockDiscordAdapter(logger=self._logger)
         self._notification_service = TradingNotificationService(
@@ -165,17 +171,37 @@ class ApplicationOrchestrator:
         await self._api_server.start()
 
         self._is_running = True
-        self._logger.info("Platform fully operational and listening", host=self._host, port=self._port)
+        self._logger.info(
+            "Platform fully operational and listening", host=self._host, port=self._port
+        )
 
     async def _on_market_event(self, event: DomainEvent) -> None:
         """Forward internal domain events to connected Web Dashboard SSE stream."""
         payload = event.payload
         if isinstance(event, TickReceivedEvent):
-            await self._api_server.broadcast_event("TickReceived", {"symbol": str(payload.get("symbol", "")), "price": str(payload.get("price", "")), "timestamp": event.timestamp.isoformat()})
+            await self._api_server.broadcast_event(
+                "TickReceived",
+                {
+                    "symbol": str(payload.get("symbol", "")),
+                    "price": str(payload.get("price", "")),
+                    "timestamp": event.timestamp.isoformat(),
+                },
+            )
         elif isinstance(event, KlineReceivedEvent):
-            await self._api_server.broadcast_event("KlineReceived", {"symbol": str(payload.get("symbol", "")), "timeframe": str(payload.get("timeframe", "")), "close": str(payload.get("close", "")), "volume": str(payload.get("volume", ""))})
+            await self._api_server.broadcast_event(
+                "KlineReceived",
+                {
+                    "symbol": str(payload.get("symbol", "")),
+                    "timeframe": str(payload.get("timeframe", "")),
+                    "close": str(payload.get("close", "")),
+                    "volume": str(payload.get("volume", "")),
+                },
+            )
         else:
-            await self._api_server.broadcast_event(event.__class__.__name__, {"event_id": str(event.event_id), "timestamp": event.timestamp.isoformat()})
+            await self._api_server.broadcast_event(
+                event.__class__.__name__,
+                {"event_id": str(event.event_id), "timestamp": event.timestamp.isoformat()},
+            )
 
     async def stop(self) -> None:
         """Gracefully shut down servers and close network IO connections."""
@@ -205,6 +231,7 @@ class ApplicationOrchestrator:
         """Register UNIX SIGINT and SIGTERM handlers for graceful shutdown."""
         loop = asyncio.get_running_loop()
         import contextlib
+
         for sig in (signal.SIGINT, signal.SIGTERM):
             with contextlib.suppress(NotImplementedError):
                 loop.add_signal_handler(sig, lambda: asyncio.create_task(self.stop()))

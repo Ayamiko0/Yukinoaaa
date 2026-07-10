@@ -22,11 +22,16 @@ class MarketNormalizer:
 
         # Check for deduplication
         last_tick = self._last_ticks.get(key)
-        if last_tick is not None:
-            # If timestamp and price are identical, treat as duplicate
-            if last_tick.timestamp == tick.timestamp and last_tick.price == tick.price and last_tick.volume == tick.volume:
-                self._logger.debug("Duplicate tick discarded", symbol=tick.symbol, exchange=tick.exchange)
-                return None
+        if (
+            last_tick is not None
+            and last_tick.timestamp == tick.timestamp
+            and last_tick.price == tick.price
+            and last_tick.volume == tick.volume
+        ):
+            self._logger.debug(
+                "Duplicate tick discarded", symbol=tick.symbol, exchange=tick.exchange
+            )
+            return None
 
         # Create normalized copy if symbol wasn't uppercase
         normalized_symbol = tick.symbol.strip().upper()
@@ -52,7 +57,8 @@ class MarketNormalizer:
             to_remove = [
                 k
                 for k in self._last_ticks
-                if (exchange is None or k[0] == exchange.lower()) and (symbol is None or k[1] == symbol.upper())
+                if (exchange is None or k[0] == exchange.lower())
+                and (symbol is None or k[1] == symbol.upper())
             ]
             for k in to_remove:
                 self._last_ticks.pop(k, None)

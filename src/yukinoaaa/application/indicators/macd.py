@@ -11,7 +11,9 @@ from yukinoaaa.domain.market.models import Kline
 class MACD(IIndicator):
     """MACD combining fast EMA (12), slow EMA (26), and signal EMA (9)."""
 
-    def __init__(self, fast_period: int = 12, slow_period: int = 26, signal_period: int = 9) -> None:
+    def __init__(
+        self, fast_period: int = 12, slow_period: int = 26, signal_period: int = 9
+    ) -> None:
         """Initialize fast, slow, and signal EMA instances."""
         if fast_period >= slow_period:
             raise ValueError("Fast EMA period must be strictly less than Slow EMA period")
@@ -37,7 +39,9 @@ class MACD(IIndicator):
 
     @property
     def is_ready(self) -> bool:
-        return self._slow_ema.is_ready and self._count >= self._slow_period + self._signal_period - 1
+        return (
+            self._slow_ema.is_ready and self._count >= self._slow_period + self._signal_period - 1
+        )
 
     def update(self, kline: Kline) -> IndicatorValue:
         """Update MACD line, signal line, and histogram."""
@@ -58,7 +62,9 @@ class MACD(IIndicator):
         if self._last_confirmed_signal is None:
             self._signal_val = macd_line
         else:
-            self._signal_val = (macd_line - self._last_confirmed_signal) * self._signal_alpha + self._last_confirmed_signal
+            self._signal_val = (
+                macd_line - self._last_confirmed_signal
+            ) * self._signal_alpha + self._last_confirmed_signal
 
         sig = self._signal_val
         hist = macd_line - sig

@@ -61,23 +61,39 @@ class RSI(IIndicator):
         if self._count <= self._period + 1:
             # Simple average during warmup
             if is_new_bar:
-                self._avg_gain = (self._last_confirmed_gain * Decimal(str(self._count - 2)) + gain) / Decimal(
-                    str(self._count - 1)
-                ) if self._count > 1 else gain
-                self._avg_loss = (self._last_confirmed_loss * Decimal(str(self._count - 2)) + loss) / Decimal(
-                    str(self._count - 1)
-                ) if self._count > 1 else loss
+                self._avg_gain = (
+                    (self._last_confirmed_gain * Decimal(str(self._count - 2)) + gain)
+                    / Decimal(str(self._count - 1))
+                    if self._count > 1
+                    else gain
+                )
+                self._avg_loss = (
+                    (self._last_confirmed_loss * Decimal(str(self._count - 2)) + loss)
+                    / Decimal(str(self._count - 1))
+                    if self._count > 1
+                    else loss
+                )
             else:
-                self._avg_gain = (self._last_confirmed_gain * Decimal(str(self._count - 2)) + gain) / Decimal(
-                    str(self._count - 1)
-                ) if self._count > 1 else gain
-                self._avg_loss = (self._last_confirmed_loss * Decimal(str(self._count - 2)) + loss) / Decimal(
-                    str(self._count - 1)
-                ) if self._count > 1 else loss
+                self._avg_gain = (
+                    (self._last_confirmed_gain * Decimal(str(self._count - 2)) + gain)
+                    / Decimal(str(self._count - 1))
+                    if self._count > 1
+                    else gain
+                )
+                self._avg_loss = (
+                    (self._last_confirmed_loss * Decimal(str(self._count - 2)) + loss)
+                    / Decimal(str(self._count - 1))
+                    if self._count > 1
+                    else loss
+                )
         else:
             # Wilder's smoothing
-            self._avg_gain = (self._last_confirmed_gain * Decimal(str(self._period - 1)) + gain) / Decimal(str(self._period))
-            self._avg_loss = (self._last_confirmed_loss * Decimal(str(self._period - 1)) + loss) / Decimal(str(self._period))
+            self._avg_gain = (
+                self._last_confirmed_gain * Decimal(str(self._period - 1)) + gain
+            ) / Decimal(str(self._period))
+            self._avg_loss = (
+                self._last_confirmed_loss * Decimal(str(self._period - 1)) + loss
+            ) / Decimal(str(self._period))
 
         self._prev_close = close_price
 

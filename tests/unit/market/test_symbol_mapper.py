@@ -8,7 +8,9 @@ def test_symbol_mapper_registration_and_conversion() -> None:
     """Verify explicit mapping registration and bidirectional conversion."""
     mapper = SymbolMapper()
     mapper.register_mapping(exchange_id="binance", standard_symbol="BTC/USDT", raw_symbol="BTCUSDT")
-    mapper.register_mapping(exchange_id="okx", standard_symbol="BTC/USDT", raw_symbol="BTC-USDT-SWAP")
+    mapper.register_mapping(
+        exchange_id="okx", standard_symbol="BTC/USDT", raw_symbol="BTC-USDT-SWAP"
+    )
 
     sym = Symbol(base_asset="BTC", quote_asset="USDT")
     assert mapper.to_exchange_symbol("binance", sym) == "BTCUSDT"

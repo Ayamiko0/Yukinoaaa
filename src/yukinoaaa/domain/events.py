@@ -23,9 +23,7 @@ class DomainEvent(BaseModel):
     correlation_id: UUID | None = Field(
         default=None, description="Optional ID to trace workflows across modules"
     )
-    payload: dict[str, Any] = Field(
-        default_factory=dict, description="Event-specific data payload"
-    )
+    payload: dict[str, Any] = Field(default_factory=dict, description="Event-specific data payload")
 
     model_config = {
         "frozen": True,

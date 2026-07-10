@@ -56,7 +56,11 @@ class HistoricalReplayEngine:
                 await self._event_bus.publish(
                     TickReceivedEvent(
                         event_type="TickReceived",
-                        payload={"symbol": kline.symbol, "price": str(kline.close), "volume": str(kline.volume)},
+                        payload={
+                            "symbol": kline.symbol,
+                            "price": str(kline.close),
+                            "volume": str(kline.volume),
+                        },
                         timestamp=kline.close_time,
                     )
                 )

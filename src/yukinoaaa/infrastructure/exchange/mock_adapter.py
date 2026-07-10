@@ -1,6 +1,7 @@
 """Mock / Simulated Exchange Adapter for testing and 24/7 standalone paper trading."""
 
 import asyncio
+import contextlib
 import random
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -63,10 +64,8 @@ class MockExchangeAdapter(IExchangeAdapter):
         self._connected = False
         if self._stream_task and not self._stream_task.done():
             self._stream_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._stream_task
-            except asyncio.CancelledError:
-                pass
         self._subscribers.clear()
         self._logger.info("Disconnected from Mock Exchange")
 
@@ -107,8 +106,8 @@ class MockExchangeAdapter(IExchangeAdapter):
             change = Decimal(str(random.uniform(-0.005, 0.005))) * price
             o = price
             c = price + change
-            h = max(o, c) + (Decimal(str(random.uniform(0.0001, 0.002))) * price)
-            l = min(o, c) - (Decimal(str(random.uniform(0.0001, 0.002))) * price)
+            high_val = max(o, c) + (Decimal(str(random.uniform(0.0001, 0.002))) * price)
+            low_val = min(o, c) - (Decimal(str(random.uniform(0.0001, 0.002))) * price)
             vol = Decimal(str(round(random.uniform(10.0, 500.0), 2)))
 
             klines.append(
@@ -118,8 +117,8 @@ class MockExchangeAdapter(IExchangeAdapter):
                     open_time=bar_open_time,
                     close_time=bar_close_time,
                     open=round(o, 4),
-                    high=round(h, 4),
-                    low=round(l, 4),
+                    high=round(high_val, 4),
+                    low=round(low_val, 4),
                     close=round(c, 4),
                     volume=vol,
                     is_closed=True,
@@ -180,7 +179,9 @@ class MockExchangeAdapter(IExchangeAdapter):
 
     def _ensure_connected(self) -> None:
         if not self._connected:
-            raise InfrastructureException("MockExchangeAdapter is not connected. Call connect() first.")
+            raise InfrastructureException(
+                "MockExchangeAdapter is not connected. Call connect() first."
+            )
 
     def _step_price(self, symbol: str) -> Decimal:
         """Random walk price step."""
@@ -220,7 +221,9 @@ class MockExchangeAdapter(IExchangeAdapter):
                         try:
                             await cb(tick)
                         except Exception as e:
-                            self._logger.error("Error invoking subscriber callback", symbol=sym, error=str(e))
+                            self._logger.error(
+                                "Error invoking subscriber callback", symbol=sym, error=str(e)
+                            )
             except asyncio.CancelledError:
                 break
             except Exception as e:

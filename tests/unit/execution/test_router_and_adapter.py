@@ -27,7 +27,9 @@ async def test_order_router_dispatches_to_mock_adapter() -> None:
     await bus.start()
 
     port_service = PortfolioService(cache, bus, logger, default_account_id="acc_router")
-    adapter = MockExecutionAdapter(port_service, slippage_rate=Decimal("0.0"), fee_rate=Decimal("0.0"))
+    adapter = MockExecutionAdapter(
+        port_service, slippage_rate=Decimal("0.0"), fee_rate=Decimal("0.0")
+    )
     router = OrderRouter(port_service, bus, logger)
     router.register_adapter("MOCK", adapter, is_default=True)
 

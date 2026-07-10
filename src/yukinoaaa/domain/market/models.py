@@ -84,7 +84,9 @@ class Kline(BaseModel):
     low: Decimal = Field(..., description="Lowest price during period")
     close: Decimal = Field(..., description="Closing price")
     volume: Decimal = Field(default=Decimal("0.0"), description="Total volume during period")
-    is_closed: bool = Field(default=True, description="Whether this candlestick period is completed")
+    is_closed: bool = Field(
+        default=True, description="Whether this candlestick period is completed"
+    )
 
     model_config = ConfigDict(frozen=True)
 
@@ -125,8 +127,12 @@ class OrderBook(BaseModel):
         default_factory=lambda: datetime.now(UTC),
         description="UTC timestamp of the order book snapshot",
     )
-    bids: list[OrderBookEntry] = Field(default_factory=list, description="Bids sorted best (highest) to worst")
-    asks: list[OrderBookEntry] = Field(default_factory=list, description="Asks sorted best (lowest) to worst")
+    bids: list[OrderBookEntry] = Field(
+        default_factory=list, description="Bids sorted best (highest) to worst"
+    )
+    asks: list[OrderBookEntry] = Field(
+        default_factory=list, description="Asks sorted best (lowest) to worst"
+    )
     exchange: str = Field(default="mock", description="Source exchange identifier")
 
     model_config = ConfigDict(frozen=True)

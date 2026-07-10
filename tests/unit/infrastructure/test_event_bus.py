@@ -41,7 +41,7 @@ async def test_event_bus_unsubscribe() -> None:
     bus = AsyncEventBus(logger=logger)
     received = 0
 
-    async def count_handler(event: DomainEvent) -> None:
+    async def count_handler(_event: DomainEvent) -> None:
         nonlocal received
         received += 1
 

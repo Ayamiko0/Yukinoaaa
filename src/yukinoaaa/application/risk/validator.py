@@ -35,14 +35,14 @@ class RiskValidator:
             return RiskDecision(
                 status=RiskStatus.REJECTED,
                 signal_id=signal.signal_id,
-                reason=f"Account drawdown {report.current_drawdown_percent*100:.1f}% exceeds max allowed {self._policy.max_drawdown_percent*100:.1f}%",
+                reason=f"Account drawdown {report.current_drawdown_percent * 100:.1f}% exceeds max allowed {self._policy.max_drawdown_percent * 100:.1f}%",
             )
 
         if report.daily_loss_percent >= self._policy.max_daily_loss_percent:
             return RiskDecision(
                 status=RiskStatus.REJECTED,
                 signal_id=signal.signal_id,
-                reason=f"Daily loss {report.daily_loss_percent*100:.1f}% exceeds limit {self._policy.max_daily_loss_percent*100:.1f}%",
+                reason=f"Daily loss {report.daily_loss_percent * 100:.1f}% exceeds limit {self._policy.max_daily_loss_percent * 100:.1f}%",
             )
 
         # Layer 2: Risk/Reward Ratio check
@@ -77,7 +77,9 @@ class RiskValidator:
         required_margin = calc_qty * current_price
         if required_margin > portfolio.available_balance:
             # Modify quantity to fit available balance
-            max_affordable_qty = (portfolio.available_balance / current_price).quantize(Decimal("0.000001"))
+            max_affordable_qty = (portfolio.available_balance / current_price).quantize(
+                Decimal("0.000001")
+            )
             if max_affordable_qty <= Decimal("0"):
                 return RiskDecision(
                     status=RiskStatus.REJECTED,

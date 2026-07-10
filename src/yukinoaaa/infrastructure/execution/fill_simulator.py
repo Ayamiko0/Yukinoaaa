@@ -37,7 +37,9 @@ class FillSimulator:
     def add_pending_order(self, order: Order) -> None:
         """Register a pending order for price monitoring."""
         self._pending_orders[order.id] = order
-        self._logger.info("Queued order for fill simulation", order_id=order.id, type=order.order_type.value)
+        self._logger.info(
+            "Queued order for fill simulation", order_id=order.id, type=order.order_type.value
+        )
 
     def remove_pending_order(self, order_id: str) -> None:
         """Remove a pending order from monitoring."""
@@ -82,13 +84,19 @@ class FillSimulator:
                 if not target_price:
                     continue
 
-                is_triggered = False
-                if order.order_type == OrderType.LIMIT:
-                    if order.side == OrderSide.BUY and tick_price <= target_price or order.side == OrderSide.SELL and tick_price >= target_price:
-                        is_triggered = True
-                elif order.order_type in (OrderType.STOP_LOSS, OrderType.TAKE_PROFIT):
-                    if order.side == OrderSide.BUY and tick_price >= target_price or order.side == OrderSide.SELL and tick_price <= target_price:
-                        is_triggered = True
+                is_triggered = (
+                    order.order_type == OrderType.LIMIT
+                    and (
+                        (order.side == OrderSide.BUY and tick_price <= target_price)
+                        or (order.side == OrderSide.SELL and tick_price >= target_price)
+                    )
+                ) or (
+                    order.order_type in (OrderType.STOP_LOSS, OrderType.TAKE_PROFIT)
+                    and (
+                        (order.side == OrderSide.BUY and tick_price >= target_price)
+                        or (order.side == OrderSide.SELL and tick_price <= target_price)
+                    )
+                )
 
                 if is_triggered:
                     triggered_ids.append(order_id)
@@ -110,7 +118,9 @@ class FillSimulator:
 
         fee = (order.quantity * fill_price * self._fee_rate).quantize(Decimal("0.000001"))
 
-        self._logger.info("Simulated order fill triggered", order_id=order.id, price=str(fill_price))
+        self._logger.info(
+            "Simulated order fill triggered", order_id=order.id, price=str(fill_price)
+        )
 
         report = ExecutionReport(
             order_id=order.id,

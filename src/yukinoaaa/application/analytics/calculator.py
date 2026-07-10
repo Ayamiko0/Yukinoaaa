@@ -21,7 +21,9 @@ class PerformanceCalculator:
         if initial_equity <= Decimal("0"):
             initial_equity = Decimal("1.0")
 
-        total_return_pct = ((final_equity - initial_equity) / initial_equity).quantize(Decimal("0.0001"))
+        total_return_pct = ((final_equity - initial_equity) / initial_equity).quantize(
+            Decimal("0.0001")
+        )
         total_trades = len(trades)
 
         if total_trades == 0:
@@ -97,7 +99,9 @@ class PerformanceCalculator:
 
             if std_dev > Decimal("0.000001"):
                 # Annualized Sharpe ratio factor approximation
-                sharpe = (mean_excess / std_dev * Decimal("15.8745")).quantize(Decimal("0.0001"))  # sqrt(252) ~ 15.8745
+                sharpe = (mean_excess / std_dev * Decimal("15.8745")).quantize(
+                    Decimal("0.0001")
+                )  # sqrt(252) ~ 15.8745
 
             # Downside deviation for Sortino
             downside_sq_sum = sum((min(Decimal("0.0"), r - rf_per_trade)) ** 2 for r in returns)
@@ -105,7 +109,9 @@ class PerformanceCalculator:
                 down_std_val = math.sqrt(float(downside_sq_sum / Decimal(len(returns))))
                 down_std = Decimal(str(down_std_val))
                 if down_std > Decimal("0.000001"):
-                    sortino = (mean_excess / down_std * Decimal("15.8745")).quantize(Decimal("0.0001"))
+                    sortino = (mean_excess / down_std * Decimal("15.8745")).quantize(
+                        Decimal("0.0001")
+                    )
 
         return PerformanceMetrics(
             initial_equity=initial_equity,

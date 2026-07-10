@@ -3,6 +3,7 @@
 from decimal import Decimal
 
 import pytest
+from pydantic import ValidationError
 
 from yukinoaaa.domain.indicators.models import IndicatorValue
 
@@ -21,5 +22,5 @@ def test_indicator_value_creation_and_helpers() -> None:
     assert val.get_value("rsi") == Decimal("65.40")
     assert val.get_value("missing", default=-1) == -1
 
-    with pytest.raises(Exception):
+    with pytest.raises((ValidationError, AttributeError)):
         val.name = "RSI_21"  # type: ignore

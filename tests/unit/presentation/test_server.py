@@ -54,7 +54,9 @@ async def test_async_api_server_endpoints_and_static_serving() -> None:
         # Test POST /api/v1/backtest
         url_bt = f"http://127.0.0.1:{port}/api/v1/backtest"
         req_body = json.dumps({"symbol": "BTC/USDT", "initial_equity": "10000"}).encode("utf-8")
-        req = Request(url_bt, data=req_body, headers={"Content-Type": "application/json"}, method="POST")
+        req = Request(
+            url_bt, data=req_body, headers={"Content-Type": "application/json"}, method="POST"
+        )
         status, content = await asyncio.to_thread(fetch_url, req)
         data = json.loads(content)
         assert status == 200
@@ -93,19 +95,27 @@ async def test_async_api_server_discord_interactions() -> None:
 
         # 1. Test PING (Type 1)
         req_ping_body = json.dumps({"type": 1}).encode("utf-8")
-        req_ping = Request(url_interact, data=req_ping_body, headers={"Content-Type": "application/json"}, method="POST")
+        req_ping = Request(
+            url_interact,
+            data=req_ping_body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
         status, content = await asyncio.to_thread(fetch_url, req_ping)
         data = json.loads(content)
         assert status == 200
         assert data["type"] == 1
 
         # 2. Test APPLICATION_COMMAND /status (Type 2)
-        req_cmd_body = json.dumps({
-            "type": 2,
-            "data": {"name": "status"},
-            "member": {"user": {"id": "tester_101"}}
-        }).encode("utf-8")
-        req_cmd = Request(url_interact, data=req_cmd_body, headers={"Content-Type": "application/json"}, method="POST")
+        req_cmd_body = json.dumps(
+            {"type": 2, "data": {"name": "status"}, "member": {"user": {"id": "tester_101"}}}
+        ).encode("utf-8")
+        req_cmd = Request(
+            url_interact,
+            data=req_cmd_body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
         status, content = await asyncio.to_thread(fetch_url, req_cmd)
         data = json.loads(content)
         assert status == 200
@@ -113,15 +123,19 @@ async def test_async_api_server_discord_interactions() -> None:
         assert "System Health Status" in data["data"]["embeds"][0]["title"]
 
         # 3. Test APPLICATION_COMMAND /price ETH/USDT with options
-        req_price_body = json.dumps({
-            "type": 2,
-            "data": {
-                "name": "price",
-                "options": [{"name": "symbol", "value": "ETH/USDT"}]
-            },
-            "user": {"id": "tester_102"}
-        }).encode("utf-8")
-        req_price = Request(url_interact, data=req_price_body, headers={"Content-Type": "application/json"}, method="POST")
+        req_price_body = json.dumps(
+            {
+                "type": 2,
+                "data": {"name": "price", "options": [{"name": "symbol", "value": "ETH/USDT"}]},
+                "user": {"id": "tester_102"},
+            }
+        ).encode("utf-8")
+        req_price = Request(
+            url_interact,
+            data=req_price_body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
         status, content = await asyncio.to_thread(fetch_url, req_price)
         data = json.loads(content)
         assert status == 200

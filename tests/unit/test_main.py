@@ -21,7 +21,9 @@ def get_free_port() -> int:
 async def test_application_orchestrator_lifecycle_and_event_forwarding() -> None:
     """Verify orchestrator starts all layers, hooks SSE forwarding, and stops cleanly."""
     port = get_free_port()
-    orchestrator = ApplicationOrchestrator(host="127.0.0.1", port=port, redis_url="redis://localhost:59999/0")
+    orchestrator = ApplicationOrchestrator(
+        host="127.0.0.1", port=port, redis_url="redis://localhost:59999/0"
+    )
 
     assert not orchestrator._is_running
 
@@ -43,7 +45,15 @@ async def test_application_orchestrator_lifecycle_and_event_forwarding() -> None
 
         kline = KlineReceivedEvent(
             event_type="KlineReceived",
-            payload={"symbol": "BTC/USDT", "timeframe": "1m", "open": "94900", "high": "95100", "low": "94800", "close": "95000", "volume": "10"},
+            payload={
+                "symbol": "BTC/USDT",
+                "timeframe": "1m",
+                "open": "94900",
+                "high": "95100",
+                "low": "94800",
+                "close": "95000",
+                "volume": "10",
+            },
             timestamp=now,
         )
         await orchestrator._on_market_event(kline)

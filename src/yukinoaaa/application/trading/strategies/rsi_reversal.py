@@ -39,7 +39,9 @@ class RsiReversalStrategy(IStrategy):
     def timeframe(self) -> str:
         return self._timeframe
 
-    def on_indicator_updated(self, indicator_name: str, values: dict[str, Any]) -> TradeSignal | None:
+    def on_indicator_updated(
+        self, indicator_name: str, values: dict[str, Any]
+    ) -> TradeSignal | None:
         """Check if updated indicator is RSI and evaluate reversal thresholds."""
         if indicator_name != self._rsi_name:
             return None
@@ -75,6 +77,6 @@ class RsiReversalStrategy(IStrategy):
 
         return None
 
-    def on_market_snapshot(self, snapshot: MarketSnapshot) -> TradeSignal | None:
+    def on_market_snapshot(self, _snapshot: MarketSnapshot) -> TradeSignal | None:
         """Not used in pure RSI reversal logic."""
         return None

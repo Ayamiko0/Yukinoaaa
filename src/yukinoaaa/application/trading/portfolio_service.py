@@ -14,12 +14,20 @@ from yukinoaaa.domain.trading.models import Portfolio, Position
 class PortfolioService:
     """Manages trading account portfolio and listens to real-time tick updates."""
 
-    def __init__(self, cache: ICache, event_bus: IEventBus, logger: ILogger, default_account_id: str = "default_acc") -> None:
+    def __init__(
+        self,
+        cache: ICache,
+        event_bus: IEventBus,
+        logger: ILogger,
+        default_account_id: str = "default_acc",
+    ) -> None:
         """Initialize portfolio service with dependencies and cache fallback."""
         self._cache = cache
         self._event_bus = event_bus
         self._logger = logger.bind(module="PortfolioService", account_id=default_account_id)
-        self._portfolio = Portfolio(account_id=default_account_id, available_balance=Decimal("100000.00"))
+        self._portfolio = Portfolio(
+            account_id=default_account_id, available_balance=Decimal("100000.00")
+        )
         self._running = False
 
     @property
@@ -46,7 +54,9 @@ class PortfolioService:
     async def open_position(self, pos: Position, required_margin: Decimal) -> None:
         """Open position in portfolio and publish PositionOpenedEvent."""
         self._portfolio.open_position(pos, required_margin)
-        self._logger.info("Opened position", symbol=pos.symbol, side=pos.side.value, quantity=str(pos.quantity))
+        self._logger.info(
+            "Opened position", symbol=pos.symbol, side=pos.side.value, quantity=str(pos.quantity)
+        )
 
         await self._event_bus.publish(
             PositionOpenedEvent(
@@ -66,7 +76,10 @@ class PortfolioService:
         """Close position in portfolio and publish PositionClosedEvent."""
         pos = self._portfolio.close_position(symbol, close_price)
         self._logger.info(
-            "Closed position", symbol=pos.symbol, side=pos.side.value, realized_pnl=str(pos.realized_pnl)
+            "Closed position",
+            symbol=pos.symbol,
+            side=pos.side.value,
+            realized_pnl=str(pos.realized_pnl),
         )
 
         await self._event_bus.publish(
@@ -98,6 +111,8 @@ class PortfolioService:
             price = Decimal(str(price_str))
             pnl = self._portfolio.update_position_price(sym, price)
             if pnl is not None:
-                self._logger.debug("Updated position mark price", symbol=sym, mark_price=str(price), pnl=str(pnl))
+                self._logger.debug(
+                    "Updated position mark price", symbol=sym, mark_price=str(price), pnl=str(pnl)
+                )
         except Exception as e:
             self._logger.error("Error updating position price on tick", symbol=sym, error=str(e))

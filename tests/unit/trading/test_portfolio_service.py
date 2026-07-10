@@ -23,7 +23,9 @@ async def test_portfolio_service_tick_updates_and_events() -> None:
     bus = AsyncEventBus(logger=logger)
     await bus.start()
 
-    service = PortfolioService(cache=cache, event_bus=bus, logger=logger, default_account_id="acc123")
+    service = PortfolioService(
+        cache=cache, event_bus=bus, logger=logger, default_account_id="acc123"
+    )
 
     events_received: list[DomainEvent] = []
 

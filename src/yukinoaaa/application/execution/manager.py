@@ -1,5 +1,6 @@
 """Order Manager central state synchronization engine."""
 
+import contextlib
 from decimal import Decimal
 from typing import Any
 
@@ -19,7 +20,9 @@ from yukinoaaa.domain.trading.models import Order, OrderSide, OrderStatus, Posit
 class OrderManager:
     """Tracks active order lifecycle, synchronizes state, and registers filled positions."""
 
-    def __init__(self, portfolio_service: PortfolioService, event_bus: IEventBus, logger: ILogger) -> None:
+    def __init__(
+        self, portfolio_service: PortfolioService, event_bus: IEventBus, logger: ILogger
+    ) -> None:
         """Initialize order manager with portfolio service and event bus."""
         self._portfolio_service = portfolio_service
         self._event_bus = event_bus
@@ -67,7 +70,9 @@ class OrderManager:
         port = self._portfolio_service.portfolio
         order = self._active_orders.get(order_id) or port.orders.get(order_id)
         if not order:
-            self._logger.warning("Received report for unknown order", order_id=order_id, status=status_str)
+            self._logger.warning(
+                "Received report for unknown order", order_id=order_id, status=status_str
+            )
             return
 
         # Track active orders
@@ -79,24 +84,28 @@ class OrderManager:
 
         try:
             # Synchronize state
-            try:
+            with contextlib.suppress(ValueError):
                 order.status = OrderStatus(status_str)
-            except ValueError:
-                pass
 
             filled_qty = Decimal(str(filled_qty_str))
             order.filled_quantity = filled_qty
             if avg_price_str:
                 order.average_fill_price = Decimal(str(avg_price_str))
 
-            self._logger.info("Updated order state", order_id=order.id, symbol=order.symbol, status=status_str)
+            self._logger.info(
+                "Updated order state", order_id=order.id, symbol=order.symbol, status=status_str
+            )
 
             # Emit partial fill event
             if status_str == ExecutionState.PARTIAL_FILLED.value:
                 await self._event_bus.publish(
                     OrderPartiallyFilledEvent(
                         event_type="OrderPartiallyFilled",
-                        payload={"order_id": order.id, "symbol": order.symbol, "filled_quantity": str(filled_qty)},
+                        payload={
+                            "order_id": order.id,
+                            "symbol": order.symbol,
+                            "filled_quantity": str(filled_qty),
+                        },
                     )
                 )
 
@@ -129,7 +138,11 @@ class OrderManager:
                 await self._event_bus.publish(
                     OrderExecutionCompletedEvent(
                         event_type="OrderExecutionCompleted",
-                        payload={"order_id": order.id, "symbol": order.symbol, "status": status_str},
+                        payload={
+                            "order_id": order.id,
+                            "symbol": order.symbol,
+                            "status": status_str,
+                        },
                     )
                 )
 
@@ -142,7 +155,11 @@ class OrderManager:
                 await self._event_bus.publish(
                     OrderExecutionCompletedEvent(
                         event_type="OrderExecutionCompleted",
-                        payload={"order_id": order.id, "symbol": order.symbol, "status": status_str},
+                        payload={
+                            "order_id": order.id,
+                            "symbol": order.symbol,
+                            "status": status_str,
+                        },
                     )
                 )
         except Exception as e:

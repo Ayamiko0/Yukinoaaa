@@ -59,7 +59,9 @@ class RedisCache(ICache):
     async def set(self, key: str, value: Any, ttl_seconds: int | None = None) -> None:
         """Store a value in cache with optional TTL."""
         client = await self._get_client()
-        serialized = json.dumps(value) if not isinstance(value, str | int | float | bool) else str(value)
+        serialized = (
+            json.dumps(value) if not isinstance(value, str | int | float | bool) else str(value)
+        )
         if client is None:
             self._memory_fallback[key] = value
             return

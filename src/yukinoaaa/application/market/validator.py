@@ -30,9 +30,10 @@ class MarketValidator:
             if tick.volume < Decimal("0"):
                 raise ValidationException(f"Invalid tick volume: {tick.volume}")
 
-            if tick.bid is not None and tick.ask is not None:
-                if tick.bid > tick.ask:
-                    raise ValidationException(f"Crossed orderbook in tick: bid {tick.bid} > ask {tick.ask}")
+            if tick.bid is not None and tick.ask is not None and tick.bid > tick.ask:
+                raise ValidationException(
+                    f"Crossed orderbook in tick: bid {tick.bid} > ask {tick.ask}"
+                )
 
             now = datetime.now(UTC)
             tick_time = tick.timestamp.astimezone(UTC)
@@ -46,7 +47,9 @@ class MarketValidator:
             self._logger.warning("Tick validation failed", symbol=tick.symbol, error=e.message)
             return False
         except Exception as e:
-            self._logger.error("Unexpected error during tick validation", symbol=tick.symbol, error=str(e))
+            self._logger.error(
+                "Unexpected error during tick validation", symbol=tick.symbol, error=str(e)
+            )
             return False
 
     def validate_kline(self, kline: Kline) -> bool:
@@ -55,9 +58,13 @@ class MarketValidator:
             if kline.high < kline.low:
                 raise ValidationException(f"Kline high ({kline.high}) lower than low ({kline.low})")
             if kline.open > kline.high or kline.open < kline.low:
-                raise ValidationException(f"Kline open ({kline.open}) out of bounds [{kline.low}, {kline.high}]")
+                raise ValidationException(
+                    f"Kline open ({kline.open}) out of bounds [{kline.low}, {kline.high}]"
+                )
             if kline.close > kline.high or kline.close < kline.low:
-                raise ValidationException(f"Kline close ({kline.close}) out of bounds [{kline.low}, {kline.high}]")
+                raise ValidationException(
+                    f"Kline close ({kline.close}) out of bounds [{kline.low}, {kline.high}]"
+                )
             if kline.open_time >= kline.close_time:
                 raise ValidationException("Kline open_time must be before close_time")
             return True

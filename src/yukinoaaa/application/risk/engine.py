@@ -106,7 +106,10 @@ class RiskEngine:
                 report = self.get_risk_report()
 
                 # Check if limits breached
-                if report.current_drawdown_percent >= self._policy.max_drawdown_percent or report.daily_loss_percent >= self._policy.max_daily_loss_percent:
+                if (
+                    report.current_drawdown_percent >= self._policy.max_drawdown_percent
+                    or report.daily_loss_percent >= self._policy.max_daily_loss_percent
+                ):
                     self._is_halted = True
                     self._logger.error(
                         "EMERGENCY HALT TRIGGERED",
@@ -116,7 +119,10 @@ class RiskEngine:
                     await self._event_bus.publish(
                         RiskLimitExceededEvent(
                             event_type="RiskLimitExceeded",
-                            payload={"account_id": report.account_id, "reason": "Max drawdown or daily loss exceeded"},
+                            payload={
+                                "account_id": report.account_id,
+                                "reason": "Max drawdown or daily loss exceeded",
+                            },
                         )
                     )
                     await self._event_bus.publish(
@@ -175,7 +181,9 @@ class RiskEngine:
                 signal_id=signal.signal_id,
                 status=decision.status.value,
                 reason=decision.reason,
-                approved_qty=str(decision.approved_quantity) if decision.approved_quantity else None,
+                approved_qty=str(decision.approved_quantity)
+                if decision.approved_quantity
+                else None,
             )
 
             await self._event_bus.publish(
@@ -186,12 +194,17 @@ class RiskEngine:
                         "signal_id": signal.signal_id,
                         "status": decision.status.value,
                         "reason": decision.reason,
-                        "approved_quantity": str(decision.approved_quantity) if decision.approved_quantity else None,
+                        "approved_quantity": str(decision.approved_quantity)
+                        if decision.approved_quantity
+                        else None,
                     },
                 )
             )
 
-            if decision.status in (RiskStatus.APPROVED, RiskStatus.MODIFIED) and decision.approved_quantity:
+            if (
+                decision.status in (RiskStatus.APPROVED, RiskStatus.MODIFIED)
+                and decision.approved_quantity
+            ):
                 order = Order(
                     symbol=signal.symbol,
                     side=signal.side,
@@ -214,4 +227,6 @@ class RiskEngine:
                     )
                 )
         except Exception as e:
-            self._logger.error("Error evaluating risk for signal", signal_id=signal_id, error=str(e))
+            self._logger.error(
+                "Error evaluating risk for signal", signal_id=signal_id, error=str(e)
+            )

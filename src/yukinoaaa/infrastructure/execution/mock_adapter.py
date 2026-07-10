@@ -76,5 +76,7 @@ class MockExecutionAdapter(IExecutionAdapter):
     async def get_order_status(self, order_id: str, symbol: str) -> ExecutionReport | None:
         """Return status query report."""
         if self._simulator and order_id in self._simulator.pending_orders:
-            return ExecutionReport(order_id=order_id, symbol=symbol, status=ExecutionState.SUBMITTED)
+            return ExecutionReport(
+                order_id=order_id, symbol=symbol, status=ExecutionState.SUBMITTED
+            )
         return None

@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class ApiResponse(BaseModel):
     """Standard generic wrapper for all API endpoint responses."""
+
     status: str = Field(default="success", description="success or error")
     data: Any | None = Field(default=None)
     error: str | None = Field(default=None)
@@ -19,6 +20,7 @@ class ApiResponse(BaseModel):
 
 class PositionSnapshot(BaseModel):
     """Snapshot of an active trading position for frontend display."""
+
     symbol: str = Field(...)
     side: str = Field(...)
     quantity: Decimal = Field(...)
@@ -32,6 +34,7 @@ class PositionSnapshot(BaseModel):
 
 class PortfolioResponse(BaseModel):
     """Real-time portfolio status response payload."""
+
     account_id: str = Field(...)
     available_balance: Decimal = Field(...)
     total_equity: Decimal = Field(...)
@@ -44,6 +47,7 @@ class PortfolioResponse(BaseModel):
 
 class BacktestRequest(BaseModel):
     """Request payload to trigger an automated backtest simulation."""
+
     symbol: str = Field(default="BTC/USDT")
     timeframe: str = Field(default="1m")
     initial_equity: Decimal = Field(default=Decimal("10000.00"), gt=0)

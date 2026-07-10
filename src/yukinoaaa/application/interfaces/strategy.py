@@ -29,7 +29,9 @@ class IStrategy(ABC):
         ...
 
     @abstractmethod
-    def on_indicator_updated(self, indicator_name: str, values: dict[str, Any]) -> TradeSignal | None:
+    def on_indicator_updated(
+        self, indicator_name: str, values: dict[str, Any]
+    ) -> TradeSignal | None:
         """Evaluate strategy logic when a technical indicator is updated.
 
         Returns TradeSignal if entry/exit setup is confirmed, or None.

@@ -37,8 +37,28 @@ async def test_replay_engine_pumps_klines_in_timestamp_order() -> None:
     t1 = datetime.now(UTC)
     t2 = t1 + timedelta(minutes=1)
 
-    k1 = Kline(symbol="BTC/USDT", timeframe="1m", open_time=t1, close_time=t1 + timedelta(seconds=59), open=Decimal("100"), high=Decimal("105"), low=Decimal("99"), close=Decimal("104"), volume=Decimal("10"))
-    k2 = Kline(symbol="BTC/USDT", timeframe="1m", open_time=t2, close_time=t2 + timedelta(seconds=59), open=Decimal("104"), high=Decimal("110"), low=Decimal("103"), close=Decimal("108"), volume=Decimal("15"))
+    k1 = Kline(
+        symbol="BTC/USDT",
+        timeframe="1m",
+        open_time=t1,
+        close_time=t1 + timedelta(seconds=59),
+        open=Decimal("100"),
+        high=Decimal("105"),
+        low=Decimal("99"),
+        close=Decimal("104"),
+        volume=Decimal("10"),
+    )
+    k2 = Kline(
+        symbol="BTC/USDT",
+        timeframe="1m",
+        open_time=t2,
+        close_time=t2 + timedelta(seconds=59),
+        open=Decimal("104"),
+        high=Decimal("110"),
+        low=Decimal("103"),
+        close=Decimal("108"),
+        volume=Decimal("15"),
+    )
 
     # Pass out of order
     count = await engine.replay_klines([k2, k1], emit_ticks=True)

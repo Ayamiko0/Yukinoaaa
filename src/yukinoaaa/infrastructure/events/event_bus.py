@@ -1,6 +1,7 @@
 """Asynchronous Event Bus implementation."""
 
 import asyncio
+import contextlib
 from collections import defaultdict
 
 from yukinoaaa.application.interfaces.event_bus import EventHandler, IEventBus
@@ -22,21 +23,29 @@ class AsyncEventBus(IEventBus):
     async def publish(self, event: DomainEvent) -> None:
         """Publish an event to the background processing queue."""
         if not self._running:
-            self._logger.warning("Event published while bus is stopped", event_type=event.event_type)
+            self._logger.warning(
+                "Event published while bus is stopped", event_type=event.event_type
+            )
         await self._queue.put(event)
-        self._logger.debug("Event queued for dispatch", event_id=str(event.event_id), event_type=event.event_type)
+        self._logger.debug(
+            "Event queued for dispatch", event_id=str(event.event_id), event_type=event.event_type
+        )
 
     async def subscribe(self, event_type: str, handler: EventHandler) -> None:
         """Register an async handler callback for an event type."""
         if handler not in self._subscribers[event_type]:
             self._subscribers[event_type].append(handler)
-            self._logger.debug("Handler subscribed", event_type=event_type, handler=handler.__name__)
+            self._logger.debug(
+                "Handler subscribed", event_type=event_type, handler=handler.__name__
+            )
 
     async def unsubscribe(self, event_type: str, handler: EventHandler) -> None:
         """Remove a previously registered handler callback."""
         if handler in self._subscribers[event_type]:
             self._subscribers[event_type].remove(handler)
-            self._logger.debug("Handler unsubscribed", event_type=event_type, handler=handler.__name__)
+            self._logger.debug(
+                "Handler unsubscribed", event_type=event_type, handler=handler.__name__
+            )
 
     async def start(self) -> None:
         """Start the background event dispatch loop."""
@@ -53,10 +62,8 @@ class AsyncEventBus(IEventBus):
         self._running = False
         if self._dispatch_task and not self._dispatch_task.done():
             self._dispatch_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._dispatch_task
-            except asyncio.CancelledError:
-                pass
         self._logger.info("Event bus stopped")
 
     async def _dispatch_loop(self) -> None:

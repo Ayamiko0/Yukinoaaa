@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class BacktestConfig(BaseModel):
     """Configuration parameters for an automated backtest simulation run."""
+
     backtest_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     symbol: str = Field(...)
     timeframe: str = Field(default="1m")
@@ -26,6 +27,7 @@ class BacktestConfig(BaseModel):
 
 class TradeRecord(BaseModel):
     """Immutable log of a completed, closed trading transaction."""
+
     trade_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     symbol: str = Field(...)
     side: str = Field(description="LONG or SHORT")
@@ -43,6 +45,7 @@ class TradeRecord(BaseModel):
 
 class PerformanceMetrics(BaseModel):
     """Quantitative analytics summary generated from backtest trade records and equity curve."""
+
     initial_equity: Decimal = Field(...)
     final_equity: Decimal = Field(...)
     total_return_percentage: Decimal = Field(default=Decimal("0.0"))

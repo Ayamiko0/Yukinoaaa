@@ -3,6 +3,7 @@
 from decimal import Decimal
 
 import pytest
+from pydantic import ValidationError
 
 from yukinoaaa.domain.execution.models import ExecutionReport, ExecutionState
 
@@ -21,5 +22,5 @@ def test_execution_report_immutability_and_attributes() -> None:
     assert report.status == ExecutionState.FILLED
     assert report.filled_quantity == Decimal("1.0")
 
-    with pytest.raises(Exception):
+    with pytest.raises((ValidationError, AttributeError)):
         report.status = ExecutionState.CANCELLED  # type: ignore

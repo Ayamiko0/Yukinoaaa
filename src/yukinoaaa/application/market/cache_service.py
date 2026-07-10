@@ -100,7 +100,9 @@ class MarketCacheService:
             if val is not None and isinstance(val, dict):
                 return MarketSnapshot.model_validate(val)
         except Exception as e:
-            self._logger.warning("Failed to retrieve snapshot from cache", symbol=symbol, error=str(e))
+            self._logger.warning(
+                "Failed to retrieve snapshot from cache", symbol=symbol, error=str(e)
+            )
 
         # Return from memory fallback or empty snapshot
         return self._memory_snapshots.get(symbol.upper(), MarketSnapshot(symbol=symbol.upper()))

@@ -6,7 +6,9 @@ from yukinoaaa.domain.trading.models import OrderSide
 
 def test_rsi_reversal_threshold_evaluation() -> None:
     """Verify strategy emits BUY on oversold, SELL on overbought, and suppresses immediate duplicates."""
-    strat = RsiReversalStrategy(symbol="ETH/USDT", timeframe="5m", oversold_threshold=30.0, overbought_threshold=70.0)
+    strat = RsiReversalStrategy(
+        symbol="ETH/USDT", timeframe="5m", oversold_threshold=30.0, overbought_threshold=70.0
+    )
     assert strat.name == "RSI_Reversal_RSI_14"
 
     # Normal RSI = 50 -> no signal
