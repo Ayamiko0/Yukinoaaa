@@ -25,7 +25,7 @@ def load_env_file(env_path: str = ".env") -> None:
                 os.environ[key] = val
 
 
-def main() -> None:
+def main(soft_fail: bool = False) -> int:
     """Register all supported Slash Commands to Discord Developer API."""
     load_env_file(".env")
     bot_token = os.environ.get("DISCORD_BOT_TOKEN", "").strip().strip("'\"")
@@ -34,13 +34,14 @@ def main() -> None:
     app_id = os.environ.get("DISCORD_APPLICATION_ID", "").strip().strip("'\"")
 
     if not bot_token or not app_id:
-        print("====== YUKINOAAA DISCORD SLASH COMMAND REGISTRAR ======")
-        print("Vui lòng điền DISCORD_APPLICATION_ID và DISCORD_BOT_TOKEN vào file .env")
-        print("Hoặc chạy trực tiếp qua biến môi trường:")
-        print(
-            "  DISCORD_APPLICATION_ID=<Client_ID> DISCORD_BOT_TOKEN=<Bot_Token> python3 scripts/register_discord_commands.py"
+        msg = (
+            "====== YUKINOAAA DISCORD SLASH COMMAND REGISTRAR ======\n"
+            "Chưa cấu hình DISCORD_APPLICATION_ID hoặc DISCORD_BOT_TOKEN.\n"
+            "Bỏ qua đăng ký lệnh Slash Command tự động."
         )
-        print("=========================================================")
+        print(msg)
+        if soft_fail:
+            return 0
         sys.exit(1)
 
     url = f"https://discord.com/api/v10/applications/{app_id}/commands"
@@ -82,6 +83,30 @@ def main() -> None:
                 }
             ],
         },
+        {
+            "name": "ai",
+            "description": "Phân tích định lượng thị trường bằng Local LLM (Ollama)",
+            "options": [
+                {
+                    "name": "symbol",
+                    "description": "Cặp tiền giao dịch (Ví dụ: BTC/USDT)",
+                    "type": 3,  # STRING
+                    "required": False,
+                }
+            ],
+        },
+        {
+            "name": "analyze",
+            "description": "Phân tích định lượng thị trường bằng Local LLM (Ollama)",
+            "options": [
+                {
+                    "name": "symbol",
+                    "description": "Cặp tiền giao dịch (Ví dụ: BTC/USDT)",
+                    "type": 3,  # STRING
+                    "required": False,
+                }
+            ],
+        },
     ]
 
     headers = {
@@ -103,14 +128,20 @@ def main() -> None:
             print("[+] THÀNH CÔNG! Đã đăng ký các lệnh sau lên Discord:")
             for cmd in res_data:
                 print(f"    - /{cmd.get('name')}: {cmd.get('description')}")
+            return 0
     except urllib.error.HTTPError as e:
         err_body = e.read().decode("utf-8")
         print(f"[-] LỖI HTTP {e.code}: {err_body}")
+        if soft_fail:
+            return 0
         sys.exit(1)
     except Exception as e:
         print(f"[-] LỖI KẾT NỐI: {str(e)}")
+        if soft_fail:
+            return 0
         sys.exit(1)
 
 
 if __name__ == "__main__":
-    main()
+    is_auto = "--auto" in sys.argv or "--soft" in sys.argv
+    sys.exit(main(soft_fail=is_auto))

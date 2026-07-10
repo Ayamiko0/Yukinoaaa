@@ -134,11 +134,11 @@ class OllamaAIAdapter(IAIService):
         return f"""You are an elite quantitative crypto trading analyst.
 Analyze the following real-time market data snapshot for symbol '{context.symbol}':
 - Current Price: {context.current_price}
-- RSI (14): {context.rsi_14 if context.rsi_14 is not None else 'N/A'}
-- MACD Line: {context.macd_line if context.macd_line is not None else 'N/A'}
-- MACD Signal: {context.macd_signal if context.macd_signal is not None else 'N/A'}
+- RSI (14): {context.rsi_14 if context.rsi_14 is not None else "N/A"}
+- MACD Line: {context.macd_line if context.macd_line is not None else "N/A"}
+- MACD Signal: {context.macd_signal if context.macd_signal is not None else "N/A"}
 - Estimated 24h Price Change: {context.price_change_24h_pct:.2f}%
-- Active Position Side: {context.active_position_side or 'NONE'}
+- Active Position Side: {context.active_position_side or "NONE"}
 
 Return strictly valid JSON with the following keys and format:
 {{

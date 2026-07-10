@@ -36,11 +36,17 @@ ENV PYTHONUNBUFFERED=1 \
 COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /app/src /app/src
 COPY --from=builder /app/pyproject.toml /app/pyproject.toml
+COPY scripts /app/scripts
+
+# Attempt command registration at Docker build step (non-fatal if secrets unset)
+RUN python /app/scripts/register_discord_commands.py --auto || true
 
 # Create a non-root user for security (Least Privilege)
-RUN groupadd -r yukinoaaa && useradd -r -g yukinoaaa -d /app -s /sbin/nologin yukinoaaa && \
+RUN chmod +x /app/scripts/docker-entrypoint.sh && \
+    groupadd -r yukinoaaa && useradd -r -g yukinoaaa -d /app -s /sbin/nologin yukinoaaa && \
     chown -R yukinoaaa:yukinoaaa /app
 USER yukinoaaa
 
-# Default command
+# Default entrypoint and command
+ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
 CMD ["python", "-m", "yukinoaaa"]

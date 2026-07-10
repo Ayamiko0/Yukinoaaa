@@ -21,9 +21,7 @@ class MockAIAdapter(IAIService):
         """Always return True for mock adapter."""
         return True
 
-    async def generate_response(
-        self, _prompt: str, _system_prompt: str | None = None
-    ) -> str:
+    async def generate_response(self, _prompt: str, _system_prompt: str | None = None) -> str:
         """Return simulated AI response text."""
         return "Simulated quantitative reasoning output for prompt."
 
