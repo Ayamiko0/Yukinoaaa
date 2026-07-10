@@ -14,6 +14,7 @@ from yukinoaaa.application.trading.portfolio_service import PortfolioService
 from yukinoaaa.domain.backtest.models import BacktestConfig
 from yukinoaaa.domain.market.models import Kline
 from yukinoaaa.presentation.api.models import (
+    AIAnalysisRequest,
     ApiResponse,
     BacktestRequest,
     PortfolioResponse,
@@ -34,6 +35,7 @@ class AsyncApiServer:
         web_dir: Path | None = None,
         discord_bot: Any | None = None,
         discord_public_key: str | None = None,
+        ai_service: Any | None = None,
     ) -> None:
         """Initialize HTTP server binding host, port, and dependent services."""
         self._host = host
@@ -41,6 +43,7 @@ class AsyncApiServer:
         self._logger = logger.bind(module="AsyncApiServer")
         self._portfolio_service = portfolio_service
         self._orchestrator = orchestrator
+        self._ai_service = ai_service
         self._web_dir = web_dir or Path(__file__).parent.parent / "web"
         self._discord_bot = discord_bot
         self._discord_public_key = discord_public_key
@@ -137,6 +140,8 @@ class AsyncApiServer:
                 await self._handle_get_portfolio(writer)
             elif method == "POST" and clean_path == "/api/v1/backtest":
                 await self._handle_post_backtest(writer, body_bytes)
+            elif method == "POST" and clean_path == "/api/v1/ai/analyze":
+                await self._handle_post_ai_analyze(writer, body_bytes)
             elif method == "POST" and clean_path == "/api/v1/discord/interactions":
                 await self._handle_discord_interactions(writer, headers, body_bytes)
             elif method == "GET" and clean_path == "/api/v1/stream":
@@ -266,6 +271,39 @@ class AsyncApiServer:
             "report_markdown": report,
         }
         await self._send_json(writer, 200, ApiResponse(data=data).model_dump())
+
+    async def _handle_post_ai_analyze(
+        self, writer: asyncio.StreamWriter, body_bytes: bytes
+    ) -> None:
+        """Execute local LLM quantitative market analysis."""
+        try:
+            req_data = json.loads(body_bytes.decode("utf-8")) if body_bytes else {}
+            req = AIAnalysisRequest(**req_data)
+        except Exception as e:
+            await self._send_json(
+                writer, 400, ApiResponse(status="error", error=f"Invalid payload: {e}").model_dump()
+            )
+            return
+
+        if not self._ai_service:
+            await self._send_json(
+                writer,
+                503,
+                ApiResponse(
+                    status="error", error="Local LLM AI service is not enabled or bound"
+                ).model_dump(),
+            )
+            return
+
+        res = await self._ai_service.analyze_symbol(
+            symbol=req.symbol,
+            current_price=req.current_price,
+            rsi_value=req.rsi_value,
+            macd_line=req.macd_line,
+            macd_signal=req.macd_signal,
+            price_change_24h_pct=req.price_change_24h_pct,
+        )
+        await self._send_json(writer, 200, ApiResponse(data=res.model_dump()).model_dump())
 
     async def _handle_sse_stream(self, writer: asyncio.StreamWriter) -> None:
         """Register connection for Server-Sent Events live streaming."""

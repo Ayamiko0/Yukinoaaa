@@ -4,6 +4,7 @@ import asyncio
 import signal
 from typing import TYPE_CHECKING
 
+from yukinoaaa.application.ai.service import MarketAnalysisAIService
 from yukinoaaa.application.backtest.orchestrator import BacktestOrchestrator
 from yukinoaaa.application.execution.manager import OrderManager
 from yukinoaaa.application.execution.router import OrderRouter
@@ -22,6 +23,8 @@ from yukinoaaa.application.trading.strategy_engine import StrategyEngine
 from yukinoaaa.domain.events import DomainEvent
 from yukinoaaa.domain.market.events import KlineReceivedEvent, TickReceivedEvent
 from yukinoaaa.domain.risk.models import RiskPolicy
+from yukinoaaa.infrastructure.ai.mock_adapter import MockAIAdapter
+from yukinoaaa.infrastructure.ai.ollama_adapter import OllamaAIAdapter
 from yukinoaaa.infrastructure.cache.redis_cache import RedisCache
 from yukinoaaa.infrastructure.config.loader import Settings
 from yukinoaaa.infrastructure.discord.mock_adapter import MockDiscordAdapter
@@ -34,6 +37,7 @@ from yukinoaaa.presentation.api.server import AsyncApiServer
 from yukinoaaa.presentation.discord.bot import DiscordBot
 
 if TYPE_CHECKING:
+    from yukinoaaa.application.interfaces.ai import IAIService
     from yukinoaaa.application.interfaces.notification import INotificationService
 
 
@@ -118,8 +122,24 @@ class ApplicationOrchestrator:
             redis_url=redis_url,
         )
 
-        # Discord Integration Layer
+        # AI & Local LLM Layer
         settings = Settings()
+        self._ai_adapter: IAIService
+        if settings.ollama_enabled:
+            self._ai_adapter = OllamaAIAdapter(
+                base_url=settings.ollama_base_url,
+                model=settings.ollama_model,
+                num_ctx=settings.ollama_num_ctx,
+                num_predict=settings.ollama_num_predict,
+                temperature=settings.ollama_temperature,
+                timeout_sec=settings.ollama_timeout_sec,
+                logger=self._logger,
+            )
+        else:
+            self._ai_adapter = MockAIAdapter(logger=self._logger)
+        self._ai_service = MarketAnalysisAIService(ai_service=self._ai_adapter, logger=self._logger)
+
+        # Discord Integration Layer
         self._discord_adapter: INotificationService
         if settings.discord_webhook_url:
             self._discord_adapter = DiscordWebhookAdapter(
@@ -137,6 +157,7 @@ class ApplicationOrchestrator:
             logger=self._logger,
             portfolio_service=self._portfolio_service,
             orchestrator=self._backtest_orchestrator,
+            ai_service=self._ai_service,
         )
 
         # Presentation Layer
@@ -148,6 +169,7 @@ class ApplicationOrchestrator:
             orchestrator=self._backtest_orchestrator,
             discord_bot=self._discord_bot,
             discord_public_key=settings.discord_public_key,
+            ai_service=self._ai_service,
         )
 
         self._is_running = False

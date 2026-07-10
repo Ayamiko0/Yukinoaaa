@@ -56,3 +56,16 @@ class BacktestRequest(BaseModel):
     fee_rate: Decimal = Field(default=Decimal("0.0010"), ge=0)
 
     model_config = ConfigDict(frozen=True)
+
+
+class AIAnalysisRequest(BaseModel):
+    """Request payload to trigger local LLM quantitative market analysis."""
+
+    symbol: str = Field(default="BTC/USDT")
+    current_price: Decimal = Field(default=Decimal("95400.00"), gt=0)
+    rsi_value: float | None = Field(default=42.5)
+    macd_line: float | None = Field(default=120.5)
+    macd_signal: float | None = Field(default=115.0)
+    price_change_24h_pct: float = Field(default=2.45)
+
+    model_config = ConfigDict(frozen=True)

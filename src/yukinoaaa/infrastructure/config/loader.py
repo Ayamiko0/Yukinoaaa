@@ -52,6 +52,34 @@ class Settings(BaseSettings, IConfig):
         default=None,
         description="Discord Application ID for registering slash commands",
     )
+    ollama_enabled: bool = Field(
+        default=True,
+        description="Enable local LLM AI integration via Ollama",
+    )
+    ollama_base_url: str = Field(
+        default="http://localhost:11434/api",
+        description="Ollama REST API base URL",
+    )
+    ollama_model: str = Field(
+        default="gemma3",
+        description="Ollama model name, e.g. gemma3 or llama3",
+    )
+    ollama_num_ctx: int = Field(
+        default=4096,
+        description="Ollama context window tokens",
+    )
+    ollama_num_predict: int = Field(
+        default=512,
+        description="Ollama max prediction tokens",
+    )
+    ollama_temperature: float = Field(
+        default=0.2,
+        description="Ollama sampling temperature",
+    )
+    ollama_timeout_sec: float = Field(
+        default=30.0,
+        description="Ollama API request timeout in seconds",
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env",

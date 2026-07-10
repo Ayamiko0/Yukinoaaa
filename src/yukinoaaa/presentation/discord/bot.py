@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from yukinoaaa.application.ai.service import MarketAnalysisAIService
 from yukinoaaa.application.backtest.orchestrator import BacktestOrchestrator
 from yukinoaaa.application.interfaces.logger import ILogger
 from yukinoaaa.application.interfaces.notification import INotificationService
@@ -18,6 +19,7 @@ class DiscordBot:
         logger: ILogger,
         portfolio_service: PortfolioService | None = None,
         orchestrator: BacktestOrchestrator | None = None,
+        ai_service: MarketAnalysisAIService | None = None,
     ) -> None:
         """Initialize Discord bot with notification adapter and command router."""
         self._notifier = notification_service
@@ -26,6 +28,7 @@ class DiscordBot:
             logger=logger,
             portfolio_service=portfolio_service,
             orchestrator=orchestrator,
+            ai_service=ai_service,
         )
         self._is_running = False
 
