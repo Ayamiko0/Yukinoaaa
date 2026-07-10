@@ -41,9 +41,20 @@ async def test_discord_command_router_execution() -> None:
     res_port = await router.execute_command("/portfolio")
     assert "Account Portfolio Snapshot" in res_port["title"]
 
-    # Test /price
-    res_price = await router.execute_command("/price ETH/USDT")
+    # Test /price multi-asset with /price <asset_class> <symbol> syntax
+    res_price = await router.execute_command("/price CRYPTO ETH/USDT")
     assert "ETH/USDT" in res_price["title"]
+    assert "CRYPTO" in res_price["description"]
+
+    res_price_comm = await router.execute_command("/price COMMODITY XAU/USD")
+    assert "XAU/USD" in res_price_comm["title"]
+
+    res_price_forex = await router.execute_command("/price FOREX EUR/USD")
+    assert "EUR/USD" in res_price_forex["title"]
+
+    # Test /news
+    res_news = await router.execute_command("/news MACRO")
+    assert "Bản Tin & Tổng Quan Thị Trường" in res_news["title"]
 
     # Test /backtest
     res_bt = await router.execute_command("/backtest BTC/USDT")

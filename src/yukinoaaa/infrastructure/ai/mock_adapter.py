@@ -41,12 +41,23 @@ class MockAIAdapter(IAIService):
                 recommendation = "SELL"
                 factors = ["RSI indicates overbought resistance level"]
 
+        detailed = (
+            f"Phân tích kỹ thuật chi tiết cho {context.symbol}: Động lượng RSI và MACD cho tín hiệu "
+            f"{sentiment.value}. Các chỉ báo kỹ thuật củng cố chiến lược {recommendation} trong ngắn hạn."
+        )
+        news = [
+            "Dữ liệu thanh khoản thị trường phái sinh 24h qua",
+            "Động thái dòng tiền tổ chức và ETF",
+        ]
+
         return AIAnalysisResult(
             symbol=context.symbol,
             model_name="mock_quant_v1",
             sentiment=sentiment,
             confidence_score=0.85,
             summary=f"Simulated AI market analysis for {context.symbol} at ${context.current_price:,.2f}.",
+            detailed_analysis=detailed,
             key_factors=factors,
+            news_references=news,
             recommendation=recommendation,
         )

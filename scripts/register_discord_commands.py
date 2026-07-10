@@ -54,13 +54,47 @@ def get_commands_payload() -> list[dict[str, Any]]:
         },
         {
             "name": "price",
-            "description": "Tra cứu giá thị trường và tín hiệu kỹ thuật của cặp tiền",
+            "description": "Tra cứu giá thị trường đa tài sản (Crypto, Forex, Vàng/Bạc/Dầu)",
             "options": [
                 {
-                    "name": "symbol",
-                    "description": "Cặp tiền giao dịch (Ví dụ: BTC/USDT, ETH/USDT)",
-                    "type": 3,  # STRING
+                    "name": "asset_class",
+                    "description": "Phân loại tài sản (Crypto, Forex, Commodity)",
+                    "type": 3,
                     "required": False,
+                    "choices": [
+                        {"name": "Crypto (Tiền điện tử: BTC, ETH, SOL...)", "value": "CRYPTO"},
+                        {"name": "Forex (Ngoại hối: EUR/USD, GBP/USD...)", "value": "FOREX"},
+                        {
+                            "name": "Commodity (Vàng XAU, Bạc XAG, Dầu WTI...)",
+                            "value": "COMMODITY",
+                        },
+                    ],
+                },
+                {
+                    "name": "symbol",
+                    "description": "Mã tài sản (Ví dụ: BTC/USDT, XAU/USD, EUR/USD, WTI/USD)",
+                    "type": 3,
+                    "required": False,
+                },
+            ],
+            **common_meta,
+        },
+        {
+            "name": "news",
+            "description": "Cập nhật, tóm tắt và tổng quan tin tức thị trường tài chính",
+            "options": [
+                {
+                    "name": "category",
+                    "description": "Danh mục tin tức cần xem (Crypto, Vĩ mô, Hàng hóa, Forex)",
+                    "type": 3,
+                    "required": False,
+                    "choices": [
+                        {"name": "Toàn thị trường (All Markets)", "value": "ALL"},
+                        {"name": "Vĩ mô toàn cầu (Global Macro)", "value": "MACRO"},
+                        {"name": "Tiền điện tử (Crypto Markets)", "value": "CRYPTO"},
+                        {"name": "Hàng hóa & Kim loại (Gold/Oil)", "value": "COMMODITY"},
+                        {"name": "Ngoại hối (Forex)", "value": "FOREX"},
+                    ],
                 }
             ],
             **common_meta,

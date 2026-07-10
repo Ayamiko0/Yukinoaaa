@@ -50,13 +50,15 @@ async def test_ollama_adapter_parsing_and_fallback() -> None:
 
     parsed = adapter._parse_json_result(
         "BTC/USDT",
-        '{"sentiment": "BULLISH", "confidence_score": 0.88, "summary": "Strong rally", "key_factors": ["MACD crossover"], "recommendation": "BUY"}',
+        '{"sentiment": "BULLISH", "confidence_score": 0.88, "summary": "Strong rally", "detailed_analysis": "RSI momentum positive", "key_factors": ["MACD crossover"], "news_references": ["ETF flows"], "recommendation": "BUY"}',
     )
     assert parsed.symbol == "BTC/USDT"
     assert parsed.sentiment == SentimentType.BULLISH
     assert parsed.confidence_score == 0.88
     assert parsed.recommendation == "BUY"
     assert parsed.key_factors == ["MACD crossover"]
+    assert parsed.detailed_analysis == "RSI momentum positive"
+    assert parsed.news_references == ["ETF flows"]
 
     # Test quantitative fallback
     fallback_ctx = MarketContextSnapshot(

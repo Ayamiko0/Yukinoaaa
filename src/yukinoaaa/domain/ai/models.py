@@ -42,8 +42,15 @@ class AIAnalysisResult(BaseModel):
     sentiment: SentimentType = Field(default=SentimentType.NEUTRAL)
     confidence_score: float = Field(default=0.5, ge=0.0, le=1.0)
     summary: str = Field(..., description="Concise executive summary of market conditions")
+    detailed_analysis: str = Field(
+        default="", description="In-depth quantitative and technical reasoning by LLM"
+    )
     key_factors: list[str] = Field(
         default_factory=list, description="Key driving technical factors"
+    )
+    news_references: list[str] = Field(
+        default_factory=list,
+        description="Relevant market news, macro events, or catalysts referenced by LLM",
     )
     recommendation: str = Field(
         default="HOLD", description="Actionable quantitative recommendation: BUY, SELL, or HOLD"
