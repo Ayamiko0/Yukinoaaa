@@ -118,8 +118,13 @@ class DiscordWebhookAdapter(INotificationService):
             return True
         except urllib.error.HTTPError as e:
             err_body = e.read().decode("utf-8", errors="replace")
+            msg = (
+                "Discord Webhook URL returned 404 Not Found. Verify DISCORD_WEBHOOK_URL in .env is valid."
+                if e.code == 404
+                else "Failed to dispatch Discord webhook message"
+            )
             self._logger.error(
-                "Failed to dispatch Discord webhook message",
+                msg,
                 status_code=e.code,
                 error=str(e),
                 response_body=err_body,
