@@ -17,7 +17,7 @@ class DiscordWebhookAdapter(INotificationService):
 
     def __init__(self, webhook_url: str, logger: ILogger) -> None:
         """Initialize webhook client with destination URL and structured logger."""
-        self._webhook_url = webhook_url
+        self._webhook_url = webhook_url.strip().strip("'\"")
         self._logger = logger.bind(module="DiscordWebhookAdapter")
         self._is_running = False
         self._ssl_context = ssl.create_default_context()
@@ -63,21 +63,32 @@ class DiscordWebhookAdapter(INotificationService):
         fields: list[dict[str, Any]] | None = None,
         footer: str | None = None,
     ) -> bool:
-        """Send a rich Discord embed card to webhook."""
+        """Send a rich Discord embed card to webhook compliant with Discord API restrictions."""
         if not self._is_running:
             self._logger.warning("Attempted to send embed while adapter stopped", title=title)
             return False
 
+        sanitized_title = str(title).strip()[:256]
+        sanitized_desc = str(description).strip()[:4096] or "Yukinoaaa System Event"
+
         embed_obj: dict[str, Any] = {
-            "title": title,
-            "description": description,
-            "color": color,
+            "title": sanitized_title,
+            "description": sanitized_desc,
+            "color": int(color) & 0xFFFFFF,
             "timestamp": datetime.now(UTC).isoformat(),
         }
+
         if fields:
-            embed_obj["fields"] = fields
+            sanitized_fields = []
+            for f in fields[:25]:
+                fname = str(f.get("name", "Field")).strip()[:256] or "Field"
+                fval = str(f.get("value", "-")).strip()[:1024] or "-"
+                finline = bool(f.get("inline", True))
+                sanitized_fields.append({"name": fname, "value": fval, "inline": finline})
+            embed_obj["fields"] = sanitized_fields
+
         if footer:
-            embed_obj["footer"] = {"text": footer}
+            embed_obj["footer"] = {"text": str(footer).strip()[:2048]}
 
         payload = {"embeds": [embed_obj]}
         return await self._post_payload(payload)
@@ -98,6 +109,15 @@ class DiscordWebhookAdapter(INotificationService):
             await asyncio.to_thread(self._send_http_request, req)
             self._logger.debug("Successfully dispatched Discord webhook message")
             return True
+        except urllib.error.HTTPError as e:
+            err_body = e.read().decode("utf-8", errors="replace")
+            self._logger.error(
+                "Failed to dispatch Discord webhook message",
+                status_code=e.code,
+                error=str(e),
+                response_body=err_body,
+            )
+            return False
         except Exception as e:
             self._logger.error("Failed to dispatch Discord webhook message", error=str(e))
             return False
