@@ -40,6 +40,126 @@ class DiscordBot:
         self._is_running = True
         self._logger.info("Discord Bot presentation interface initialized and listening")
 
+    async def sync_commands(
+        self, bot_token: str, application_id: str, guild_id: str | None = None
+    ) -> bool:
+        """Asynchronously sync all slash commands (including /ai) to Discord API v10."""
+        import aiohttp
+
+        token = bot_token.strip().strip("'\"")
+        if token.lower().startswith("bot "):
+            token = token[4:].strip()
+        app_id = application_id.strip().strip("'\"")
+        if not token or not app_id:
+            self._logger.warning("Discord credentials missing, skipping slash command registration")
+            return False
+
+        common_meta = {"integration_types": [0, 1], "contexts": [0, 1, 2]}
+        commands = [
+            {
+                "name": "help",
+                "description": "Hiển thị danh sách lệnh hỗ trợ Yukinoaaa Trading Assistant",
+                **common_meta,
+            },
+            {
+                "name": "status",
+                "description": "Kiểm tra tình trạng sức khỏe hệ thống Yukinoaaa",
+                **common_meta,
+            },
+            {
+                "name": "portfolio",
+                "description": "Xem báo cáo tổng quan tài khoản giao dịch",
+                **common_meta,
+            },
+            {
+                "name": "price",
+                "description": "Tra cứu giá thị trường và tín hiệu kỹ thuật",
+                "options": [
+                    {
+                        "name": "symbol",
+                        "description": "Cặp tiền giao dịch (Ví dụ: BTC/USDT)",
+                        "type": 3,
+                        "required": False,
+                    }
+                ],
+                **common_meta,
+            },
+            {
+                "name": "backtest",
+                "description": "Chạy mô phỏng định lượng Backtest cho chiến lược",
+                "options": [
+                    {
+                        "name": "symbol",
+                        "description": "Cặp tiền giao dịch (Ví dụ: BTC/USDT)",
+                        "type": 3,
+                        "required": False,
+                    }
+                ],
+                **common_meta,
+            },
+            {
+                "name": "ai",
+                "description": "Phân tích định lượng thị trường bằng Local LLM (Ollama)",
+                "options": [
+                    {
+                        "name": "symbol",
+                        "description": "Cặp tiền giao dịch (Ví dụ: BTC/USDT)",
+                        "type": 3,
+                        "required": False,
+                    }
+                ],
+                **common_meta,
+            },
+            {
+                "name": "analyze",
+                "description": "Phân tích định lượng thị trường bằng Local LLM (Ollama)",
+                "options": [
+                    {
+                        "name": "symbol",
+                        "description": "Cặp tiền giao dịch (Ví dụ: BTC/USDT)",
+                        "type": 3,
+                        "required": False,
+                    }
+                ],
+                **common_meta,
+            },
+        ]
+
+        headers = {
+            "Authorization": f"Bot {token}",
+            "Content-Type": "application/json",
+            "User-Agent": "DiscordBot (https://github.com/ayamiko0/Yukinoaaa, 0.1.0)",
+        }
+
+        urls = []
+        if guild_id:
+            urls.append(
+                f"https://discord.com/api/v10/applications/{app_id}/guilds/{guild_id}/commands"
+            )
+        urls.append(f"https://discord.com/api/v10/applications/{app_id}/commands")
+
+        success = False
+        async with aiohttp.ClientSession(headers=headers) as session:
+            for url in urls:
+                try:
+                    async with session.put(
+                        url, json=commands, timeout=aiohttp.ClientTimeout(total=15)
+                    ) as resp:
+                        if resp.status in (200, 201):
+                            self._logger.info("Successfully synced Discord slash commands", url=url)
+                            success = True
+                        else:
+                            err = await resp.text()
+                            self._logger.error(
+                                "Failed syncing Discord commands",
+                                status_code=resp.status,
+                                error=err,
+                            )
+                except Exception as exc:
+                    self._logger.error("Exception syncing Discord commands", error=str(exc))
+
+        return success
+
     async def stop(self) -> None:
         """Stop Discord bot interface."""
         if not self._is_running:

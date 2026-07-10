@@ -80,3 +80,13 @@ async def test_discord_bot_interface() -> None:
 
     await bot.stop()
     await bot.stop()  # Idempotent
+
+
+@pytest.mark.asyncio
+async def test_discord_bot_sync_commands() -> None:
+    """Test sync_commands early return when credentials missing."""
+    logger = StructlogLogger()
+    mock_discord = MockDiscordAdapter(logger=logger)
+    bot = DiscordBot(notification_service=mock_discord, logger=logger)
+    res = await bot.sync_commands("", "")
+    assert res is False

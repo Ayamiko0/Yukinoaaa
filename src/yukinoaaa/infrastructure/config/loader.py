@@ -52,6 +52,10 @@ class Settings(BaseSettings, IConfig):
         default=None,
         description="Discord Application ID for registering slash commands",
     )
+    discord_guild_id: str | None = Field(
+        default=None,
+        description="Optional Discord Guild ID for instant slash command registration",
+    )
     ollama_enabled: bool = Field(
         default=True,
         description="Enable local LLM AI integration via Ollama",

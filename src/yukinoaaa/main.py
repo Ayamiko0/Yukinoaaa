@@ -195,6 +195,13 @@ class ApplicationOrchestrator:
         await self._streamer.start(["BTC/USDT"])
         await self._notification_service.start()
         await self._discord_bot.start()
+        settings = Settings()
+        if settings.discord_bot_token and settings.discord_application_id:
+            await self._discord_bot.sync_commands(
+                bot_token=settings.discord_bot_token,
+                application_id=settings.discord_application_id,
+                guild_id=settings.discord_guild_id,
+            )
         await self._api_server.start()
 
         self._is_running = True
