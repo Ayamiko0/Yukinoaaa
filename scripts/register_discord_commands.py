@@ -29,6 +29,8 @@ def main() -> None:
     """Register all supported Slash Commands to Discord Developer API."""
     load_env_file(".env")
     bot_token = os.environ.get("DISCORD_BOT_TOKEN", "").strip().strip("'\"")
+    if bot_token.lower().startswith("bot "):
+        bot_token = bot_token[4:].strip()
     app_id = os.environ.get("DISCORD_APPLICATION_ID", "").strip().strip("'\"")
 
     if not bot_token or not app_id:
@@ -85,6 +87,7 @@ def main() -> None:
     headers = {
         "Authorization": f"Bot {bot_token}",
         "Content-Type": "application/json",
+        "User-Agent": "DiscordBot (https://github.com/ayamiko0/Yukinoaaa, 0.1.0)",
     }
 
     print(
