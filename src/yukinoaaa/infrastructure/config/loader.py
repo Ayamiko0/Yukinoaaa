@@ -11,7 +11,9 @@ from yukinoaaa.application.interfaces.config import IConfig
 class Settings(BaseSettings, IConfig):
     """Application settings loaded from environment variables and .env file."""
 
-    app_env: str = Field(default="development", description="Environment mode: development, staging, production")
+    app_env: str = Field(
+        default="development", description="Environment mode: development, staging, production"
+    )
     debug: bool = Field(default=False, description="Enable debug mode")
     log_level: str = Field(default="INFO", description="Logging severity level")
     database_url: str = Field(
@@ -45,6 +47,10 @@ class Settings(BaseSettings, IConfig):
     discord_public_key: str | None = Field(
         default=None,
         description="Discord Application Public Key for interaction signature verification",
+    )
+    discord_application_id: str | None = Field(
+        default=None,
+        description="Discord Application ID for registering slash commands",
     )
 
     model_config = SettingsConfigDict(
