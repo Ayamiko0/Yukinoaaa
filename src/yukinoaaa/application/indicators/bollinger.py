@@ -3,10 +3,14 @@
 import math
 from collections import deque
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from yukinoaaa.application.interfaces.indicator import IIndicator
 from yukinoaaa.domain.indicators.models import IndicatorValue
 from yukinoaaa.domain.market.models import Kline
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 class BollingerBands(IIndicator):
@@ -19,7 +23,7 @@ class BollingerBands(IIndicator):
         self._period = period
         self._multiplier = Decimal(str(std_dev_multiplier))
         self._window: deque[Decimal] = deque(maxlen=period)
-        self._last_open_time = None
+        self._last_open_time: datetime | None = None
 
     @property
     def name(self) -> str:

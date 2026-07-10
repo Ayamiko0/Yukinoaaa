@@ -89,6 +89,17 @@ class Position(BaseModel):
             self.unrealized_pnl = (self.entry_price - self.mark_price) * self.quantity
         return self.unrealized_pnl
 
+    @property
+    def current_price(self) -> Decimal:
+        """Alias for mark_price."""
+        return self.mark_price
+
+    @property
+    def unrealized_pnl_percentage(self) -> Decimal:
+        """Unrealized PnL percentage based on position entry cost."""
+        cost = self.entry_price * self.quantity
+        return (self.unrealized_pnl / cost) * Decimal("100") if cost > 0 else Decimal("0.0")
+
 
 class TradeSignal(BaseModel):
     """Immutable value object representing a quantitative trade setup emitted by a strategy."""
@@ -131,6 +142,13 @@ class Portfolio(BaseModel):
     def total_equity(self) -> Decimal:
         """Total equity = available balance + margin used + total unrealized PnL."""
         return self.available_balance + self.margin_used + self.total_unrealized_pnl
+
+    @property
+    def active_orders(self) -> list[Order]:
+        """List active pending orders."""
+        return [
+            o for o in self.orders.values() if o.status in (OrderStatus.PENDING, OrderStatus.OPEN)
+        ]
 
     def open_position(self, pos: Position, required_margin: Decimal) -> None:
         """Open a new position or increase existing one, allocating margin from available balance."""

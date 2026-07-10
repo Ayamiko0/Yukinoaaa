@@ -1,10 +1,14 @@
 """Relative Strength Index (RSI) implementation with Wilder's smoothing."""
 
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from yukinoaaa.application.interfaces.indicator import IIndicator
 from yukinoaaa.domain.indicators.models import IndicatorValue
 from yukinoaaa.domain.market.models import Kline
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 class RSI(IIndicator):
@@ -19,7 +23,7 @@ class RSI(IIndicator):
         self._prev_close: Decimal | None = None
         self._avg_gain = Decimal("0")
         self._avg_loss = Decimal("0")
-        self._last_open_time = None
+        self._last_open_time: datetime | None = None
         self._last_confirmed_close: Decimal | None = None
         self._last_confirmed_gain = Decimal("0")
         self._last_confirmed_loss = Decimal("0")

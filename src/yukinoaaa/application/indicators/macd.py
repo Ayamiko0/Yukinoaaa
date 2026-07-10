@@ -1,11 +1,15 @@
 """Moving Average Convergence Divergence (MACD) indicator implementation."""
 
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from yukinoaaa.application.indicators.ema import EMA
 from yukinoaaa.application.interfaces.indicator import IIndicator
 from yukinoaaa.domain.indicators.models import IndicatorValue
 from yukinoaaa.domain.market.models import Kline
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 class MACD(IIndicator):
@@ -26,7 +30,7 @@ class MACD(IIndicator):
         self._signal_alpha = Decimal("2") / Decimal(str(signal_period + 1))
         self._signal_val: Decimal | None = None
         self._count = 0
-        self._last_open_time = None
+        self._last_open_time: datetime | None = None
         self._last_confirmed_signal: Decimal | None = None
 
     @property

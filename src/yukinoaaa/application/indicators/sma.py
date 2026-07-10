@@ -2,10 +2,14 @@
 
 from collections import deque
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from yukinoaaa.application.interfaces.indicator import IIndicator
 from yukinoaaa.domain.indicators.models import IndicatorValue
 from yukinoaaa.domain.market.models import Kline
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 class SMA(IIndicator):
@@ -18,7 +22,7 @@ class SMA(IIndicator):
         self._period = period
         self._window: deque[Decimal] = deque(maxlen=period)
         self._running_sum = Decimal("0")
-        self._last_open_time = None
+        self._last_open_time: datetime | None = None
 
     @property
     def name(self) -> str:

@@ -2,6 +2,7 @@
 
 import asyncio
 import signal
+from typing import TYPE_CHECKING
 
 from yukinoaaa.application.backtest.orchestrator import BacktestOrchestrator
 from yukinoaaa.application.execution.manager import OrderManager
@@ -31,6 +32,9 @@ from yukinoaaa.infrastructure.execution.fill_simulator import FillSimulator
 from yukinoaaa.infrastructure.logging.logger import StructlogLogger
 from yukinoaaa.presentation.api.server import AsyncApiServer
 from yukinoaaa.presentation.discord.bot import DiscordBot
+
+if TYPE_CHECKING:
+    from yukinoaaa.application.interfaces.notification import INotificationService
 
 
 class ApplicationOrchestrator:
@@ -116,6 +120,7 @@ class ApplicationOrchestrator:
 
         # Discord Integration Layer
         settings = Settings()
+        self._discord_adapter: INotificationService
         if settings.discord_webhook_url:
             self._discord_adapter = DiscordWebhookAdapter(
                 webhook_url=settings.discord_webhook_url, logger=self._logger

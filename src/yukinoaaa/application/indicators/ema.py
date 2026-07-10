@@ -1,10 +1,14 @@
 """Exponential Moving Average (EMA) indicator implementation."""
 
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from yukinoaaa.application.interfaces.indicator import IIndicator
 from yukinoaaa.domain.indicators.models import IndicatorValue
 from yukinoaaa.domain.market.models import Kline
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 class EMA(IIndicator):
@@ -19,7 +23,7 @@ class EMA(IIndicator):
         self._count = 0
         self._current_val: Decimal | None = None
         self._warmup_sum = Decimal("0")
-        self._last_open_time = None
+        self._last_open_time: datetime | None = None
         self._last_confirmed_val: Decimal | None = None
 
     @property
