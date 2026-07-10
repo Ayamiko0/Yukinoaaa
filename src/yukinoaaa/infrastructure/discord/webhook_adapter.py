@@ -68,8 +68,8 @@ class DiscordWebhookAdapter(INotificationService):
             self._logger.warning("Attempted to send embed while adapter stopped", title=title)
             return False
 
-        sanitized_title = str(title).strip()[:256]
-        sanitized_desc = str(description).strip()[:4096] or "Yukinoaaa System Event"
+        sanitized_title = str(title).strip()[:256] or "Yukinoaaa System Event"
+        sanitized_desc = str(description).strip()[:4096] or "System Event"
 
         embed_obj: dict[str, Any] = {
             "title": sanitized_title,
@@ -78,12 +78,17 @@ class DiscordWebhookAdapter(INotificationService):
             "timestamp": datetime.now(UTC).isoformat(),
         }
 
+        total_len = len(sanitized_title) + len(sanitized_desc)
+
         if fields:
             sanitized_fields = []
             for f in fields[:25]:
                 fname = str(f.get("name", "Field")).strip()[:256] or "Field"
                 fval = str(f.get("value", "-")).strip()[:1024] or "-"
                 finline = bool(f.get("inline", True))
+                if total_len + len(fname) + len(fval) > 5800:
+                    break
+                total_len += len(fname) + len(fval)
                 sanitized_fields.append({"name": fname, "value": fval, "inline": finline})
             embed_obj["fields"] = sanitized_fields
 
@@ -101,8 +106,10 @@ class DiscordWebhookAdapter(INotificationService):
                 self._webhook_url,
                 data=data_bytes,
                 headers={
-                    "Content-Type": "application/json; charset=utf-8",
-                    "User-Agent": "Yukinoaaa-Discord-Bot/1.0",
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                    "Accept": "application/json",
+                    "Accept-Language": "en-US,en;q=0.9",
                 },
                 method="POST",
             )

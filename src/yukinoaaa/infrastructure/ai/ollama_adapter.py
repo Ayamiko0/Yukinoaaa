@@ -111,23 +111,31 @@ class OllamaAIAdapter(IAIService):
         }
 
         session = await self._get_session()
-        try:
-            async with session.post(
-                f"{self._base_url}/generate",
-                json=payload,
-                timeout=aiohttp.ClientTimeout(total=self._timeout_sec),
-            ) as response:
-                response.raise_for_status()
-                data = await response.json()
-                raw_json = str(data.get("response", "{}"))
-                return self._parse_json_result(context.symbol, raw_json)
-        except (aiohttp.ClientError, TimeoutError, json.JSONDecodeError, ValueError) as exc:
-            self._logger.warning(
-                "Ollama structured analysis failed, using quantitative fallback",
-                symbol=context.symbol,
-                error=str(exc),
-            )
-            return self._fallback_result(context)
+        urls = [self._base_url]
+        if "host.docker.internal" in self._base_url:
+            urls.append("http://127.0.0.1:11434/api")
+
+        last_exc: Exception | None = None
+        for url in urls:
+            try:
+                async with session.post(
+                    f"{url}/generate",
+                    json=payload,
+                    timeout=aiohttp.ClientTimeout(total=self._timeout_sec),
+                ) as response:
+                    response.raise_for_status()
+                    data = await response.json()
+                    raw_json = str(data.get("response", "{}"))
+                    return self._parse_json_result(context.symbol, raw_json)
+            except (aiohttp.ClientError, TimeoutError, json.JSONDecodeError, ValueError) as exc:
+                last_exc = exc
+
+        self._logger.warning(
+            "Ollama structured analysis failed, using quantitative fallback",
+            symbol=context.symbol,
+            error=str(last_exc),
+        )
+        return self._fallback_result(context)
 
     def _build_analysis_prompt(self, context: MarketContextSnapshot) -> str:
         """Construct quantitative market analysis prompt requesting structured JSON output."""
