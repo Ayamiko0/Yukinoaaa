@@ -88,7 +88,9 @@ class AsyncApiServer:
         for client in disconnected:
             self._sse_clients.discard(client)
 
-    async def _handle_client(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
+    async def _handle_client(
+        self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
+    ) -> None:
         """Parse HTTP request line and route to REST or static endpoints."""
         try:
             request_line_bytes = await reader.readline()
@@ -126,23 +128,32 @@ class AsyncApiServer:
                 body_bytes = await reader.readexactly(content_length)
 
             # Routing
-            if method == "GET" and path in ("/health", "/api/v1/health"):
-                await self._send_json(writer, 200, ApiResponse(data={"status": "ONLINE", "uptime": "ok"}).model_dump())
-            elif method == "GET" and path == "/api/v1/portfolio":
+            clean_path = path.split("?")[0].rstrip("/") or "/"
+            if method == "GET" and clean_path in ("/health", "/api/v1/health"):
+                await self._send_json(
+                    writer, 200, ApiResponse(data={"status": "ONLINE", "uptime": "ok"}).model_dump()
+                )
+            elif method == "GET" and clean_path == "/api/v1/portfolio":
                 await self._handle_get_portfolio(writer)
-            elif method == "POST" and path == "/api/v1/backtest":
+            elif method == "POST" and clean_path == "/api/v1/backtest":
                 await self._handle_post_backtest(writer, body_bytes)
-            elif method == "POST" and path == "/api/v1/discord/interactions":
+            elif method == "POST" and clean_path == "/api/v1/discord/interactions":
                 await self._handle_discord_interactions(writer, headers, body_bytes)
-            elif method == "GET" and path == "/api/v1/stream":
+            elif method == "GET" and clean_path == "/api/v1/stream":
                 await self._handle_sse_stream(writer)
             elif method == "GET":
-                await self._serve_static(writer, path)
+                await self._serve_static(writer, clean_path)
             else:
-                await self._send_json(writer, 404, ApiResponse(status="error", error="Endpoint not found").model_dump())
+                await self._send_json(
+                    writer,
+                    404,
+                    ApiResponse(status="error", error="Endpoint not found").model_dump(),
+                )
         except Exception as e:
             with contextlib.suppress(Exception):
-                await self._send_json(writer, 500, ApiResponse(status="error", error=str(e)).model_dump())
+                await self._send_json(
+                    writer, 500, ApiResponse(status="error", error=str(e)).model_dump()
+                )
         finally:
             if writer not in self._sse_clients:
                 try:
@@ -192,7 +203,11 @@ class AsyncApiServer:
             req_data = json.loads(body_bytes.decode("utf-8")) if body_bytes else {}
             req = BacktestRequest(**req_data)
         except Exception as e:
-            await self._send_json(writer, 400, ApiResponse(status="error", error=f"Invalid request payload: {e}").model_dump())
+            await self._send_json(
+                writer,
+                400,
+                ApiResponse(status="error", error=f"Invalid request payload: {e}").model_dump(),
+            )
             return
 
         now = datetime.now(UTC)
@@ -208,8 +223,28 @@ class AsyncApiServer:
         )
 
         klines = [
-            Kline(symbol=req.symbol, timeframe=req.timeframe, open_time=now, close_time=now + timedelta(seconds=59), open=Decimal("100"), high=Decimal("105"), low=Decimal("99"), close=Decimal("104"), volume=Decimal("10")),
-            Kline(symbol=req.symbol, timeframe=req.timeframe, open_time=now + timedelta(minutes=1), close_time=now + timedelta(minutes=1, seconds=59), open=Decimal("104"), high=Decimal("110"), low=Decimal("103"), close=Decimal("108"), volume=Decimal("15")),
+            Kline(
+                symbol=req.symbol,
+                timeframe=req.timeframe,
+                open_time=now,
+                close_time=now + timedelta(seconds=59),
+                open=Decimal("100"),
+                high=Decimal("105"),
+                low=Decimal("99"),
+                close=Decimal("104"),
+                volume=Decimal("10"),
+            ),
+            Kline(
+                symbol=req.symbol,
+                timeframe=req.timeframe,
+                open_time=now + timedelta(minutes=1),
+                close_time=now + timedelta(minutes=1, seconds=59),
+                open=Decimal("104"),
+                high=Decimal("110"),
+                low=Decimal("103"),
+                close=Decimal("108"),
+                volume=Decimal("15"),
+            ),
         ]
 
         if self._orchestrator:
@@ -217,7 +252,13 @@ class AsyncApiServer:
             report = self._orchestrator.generate_markdown_report(config, metrics)
         else:
             from yukinoaaa.application.analytics.calculator import PerformanceCalculator
-            metrics = PerformanceCalculator.calculate_metrics(req.initial_equity, req.initial_equity * Decimal("1.08"), [], [req.initial_equity, req.initial_equity * Decimal("1.08")])
+
+            metrics = PerformanceCalculator.calculate_metrics(
+                req.initial_equity,
+                req.initial_equity * Decimal("1.08"),
+                [],
+                [req.initial_equity, req.initial_equity * Decimal("1.08")],
+            )
             report = "# Quantitative Backtest Report\n\nSimulation completed successfully."
 
         data = {
@@ -241,7 +282,9 @@ class AsyncApiServer:
         self._sse_clients.add(writer)
 
         # Send initial connected event
-        init_msg = f"event: connected\ndata: {json.dumps({'status': 'SSE streaming live'})}\n\n".encode()
+        init_msg = (
+            f"event: connected\ndata: {json.dumps({'status': 'SSE streaming live'})}\n\n".encode()
+        )
         writer.write(init_msg)
         await writer.drain()
 
@@ -252,7 +295,9 @@ class AsyncApiServer:
 
         file_path = self._web_dir / path.lstrip("/")
         if not file_path.exists() or not file_path.is_file():
-            await self._send_json(writer, 404, ApiResponse(status="error", error="File not found").model_dump())
+            await self._send_json(
+                writer, 404, ApiResponse(status="error", error="File not found").model_dump()
+            )
             return
 
         content_types = {
@@ -277,7 +322,9 @@ class AsyncApiServer:
         writer.write(headers + content)
         await writer.drain()
 
-    async def _handle_discord_interactions(self, writer: asyncio.StreamWriter, headers: dict[str, str], body_bytes: bytes) -> None:
+    async def _handle_discord_interactions(
+        self, writer: asyncio.StreamWriter, headers: dict[str, str], body_bytes: bytes
+    ) -> None:
         """Handle Discord HTTP Interactions Gateway requests for slash commands."""
         if not self._discord_bot:
             await self._send_json(writer, 503, {"error": "Discord Bot service is not bound"})
@@ -288,7 +335,9 @@ class AsyncApiServer:
             sig = headers.get("x-signature-ed25519", "")
             ts = headers.get("x-signature-timestamp", "")
             if not self._verify_discord_signature(self._discord_public_key, sig, ts, body_bytes):
-                await self._send_json(writer, 401, {"error": "Invalid interaction request signature"})
+                await self._send_json(
+                    writer, 401, {"error": "Invalid interaction request signature"}
+                )
                 return
 
         try:
@@ -314,14 +363,14 @@ class AsyncApiServer:
                 if val is not None:
                     args.append(str(val))
             full_cmd = f"/{cmd_name} " + " ".join(args) if args else f"/{cmd_name}"
-            user_id = payload.get("member", {}).get("user", {}).get("id") or payload.get("user", {}).get("id", "discord_user")
+            user_id = payload.get("member", {}).get("user", {}).get("id") or payload.get(
+                "user", {}
+            ).get("id", "discord_user")
 
             embed = await self._discord_bot.handle_message(full_cmd, user_id=str(user_id))
             resp = {
                 "type": 4,  # CHANNEL_MESSAGE_WITH_SOURCE
-                "data": {
-                    "embeds": [embed]
-                }
+                "data": {"embeds": [embed]},
             }
             await self._send_json(writer, 200, resp)
             return
@@ -329,22 +378,29 @@ class AsyncApiServer:
         await self._send_json(writer, 400, {"error": "Unsupported interaction type"})
 
     @staticmethod
-    def _verify_discord_signature(public_key_hex: str, signature_hex: str, timestamp: str, body: bytes) -> bool:
+    def _verify_discord_signature(
+        public_key_hex: str, signature_hex: str, timestamp: str, body: bytes
+    ) -> bool:
         """Verify Discord Ed25519 request signature using PyNaCl or cryptography if installed."""
         if not signature_hex or not timestamp:
             return False
         try:
-            message = timestamp.encode("utf-8") + body
+            pub_key_clean = public_key_hex.strip().strip("'\"")
+            sig_clean = signature_hex.strip().strip("'\"")
+            ts_clean = timestamp.strip().strip("'\"")
+            message = ts_clean.encode("utf-8") + body
             try:
                 import nacl.signing
-                verify_key = nacl.signing.VerifyKey(bytes.fromhex(public_key_hex))
-                verify_key.verify(message, bytes.fromhex(signature_hex))
+
+                verify_key = nacl.signing.VerifyKey(bytes.fromhex(pub_key_clean))
+                verify_key.verify(message, bytes.fromhex(sig_clean))
                 return True
             except ImportError:
                 try:
                     from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
-                    pub_key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(public_key_hex))
-                    pub_key.verify(bytes.fromhex(signature_hex), message)
+
+                    pub_key = Ed25519PublicKey.from_public_bytes(bytes.fromhex(pub_key_clean))
+                    pub_key.verify(bytes.fromhex(sig_clean), message)
                     return True
                 except ImportError:
                     # Allow fallback pass if neither optional crypto library is installed in container
@@ -352,9 +408,18 @@ class AsyncApiServer:
         except Exception:
             return False
 
-    async def _send_json(self, writer: asyncio.StreamWriter, status_code: int, data: dict[str, Any]) -> None:
+    async def _send_json(
+        self, writer: asyncio.StreamWriter, status_code: int, data: dict[str, Any]
+    ) -> None:
         """Helper to format and transmit HTTP JSON response."""
-        status_texts = {200: "OK", 400: "Bad Request", 401: "Unauthorized", 404: "Not Found", 500: "Internal Server Error", 503: "Service Unavailable"}
+        status_texts = {
+            200: "OK",
+            400: "Bad Request",
+            401: "Unauthorized",
+            404: "Not Found",
+            500: "Internal Server Error",
+            503: "Service Unavailable",
+        }
         body = json.dumps(data, default=str).encode("utf-8")
         headers = (
             f"HTTP/1.1 {status_code} {status_texts.get(status_code, 'OK')}\r\n"

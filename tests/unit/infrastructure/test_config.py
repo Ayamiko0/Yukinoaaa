@@ -5,7 +5,7 @@ from yukinoaaa.infrastructure.config.loader import Settings
 
 def test_settings_default_values() -> None:
     """Verify default setting values are loaded securely."""
-    config = Settings()
+    config = Settings(_env_file=None)
     assert config.get("app_env") == "development"
     assert config.is_production() is False
     assert config.is_debug() is False
